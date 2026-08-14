@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  community-service:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: community-service } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: community-service/package-lock.json }
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - run: xcodebuild -project NukeUnitTracker.xcodeproj -scheme NukeUnitTracker -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' test CODE_SIGNING_ALLOWED=NO
