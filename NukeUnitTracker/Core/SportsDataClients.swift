@@ -25,8 +25,16 @@ struct OddsAPIClient {
 }
 
 private struct ESPNScoreboard: Decodable {
-    struct Event: Decodable { struct Status: Decodable { struct Type: Decodable { let completed: Bool }; let type: Type }; let id: String; let status: Status }
+    struct Event: Decodable {
+        struct Status: Decodable {
+            struct Details: Decodable { let completed: Bool }
+            let type: Details
+        }
+
+        let id: String
+        let status: Status
+    }
+
     let events: [Event]
 }
 struct OddsAPISport: Decodable, Identifiable { let key: String; let title: String; var id: String { key } }
-
