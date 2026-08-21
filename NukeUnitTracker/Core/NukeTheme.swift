@@ -27,8 +27,26 @@ struct NukeCard<Content: View>: View {
     var body: some View {
         content
             .padding()
-            .background(NukeTheme.surfaceRaised, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(NukeTheme.border, lineWidth: 1))
+            .background(
+                LinearGradient(
+                    colors: [NukeTheme.surfaceRaised, NukeTheme.surface.opacity(0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(
+                        LinearGradient(
+                            colors: [NukeTheme.cyan.opacity(0.25), NukeTheme.border, NukeTheme.ember.opacity(0.18)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+            .shadow(color: .black.opacity(0.24), radius: 10, y: 5)
     }
 }
 
@@ -43,6 +61,12 @@ struct NukeCommandBackdrop: View {
                 center: .topTrailing,
                 startRadius: 12,
                 endRadius: 420
+            )
+            RadialGradient(
+                colors: [NukeTheme.orange.opacity(0.10), .clear],
+                center: .bottomLeading,
+                startRadius: 10,
+                endRadius: 360
             )
             Canvas { context, size in
                 var grid = Path()
