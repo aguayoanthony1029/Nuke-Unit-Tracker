@@ -38,33 +38,28 @@ struct DashboardView: View {
             Image("BrandMark")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 44, height: 44)
-                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(NukeTheme.orange.opacity(0.6), lineWidth: 1))
+                .frame(width: 38, height: 38)
+                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(NukeTheme.orange.opacity(0.6), lineWidth: 1))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("NUKE")
-                    .font(.system(size: 22, weight: .black, design: .rounded))
-                    .tracking(2)
+                    .font(.system(size: 20, weight: .black, design: .rounded))
+                    .tracking(1.5)
                 Text("COMMAND CENTER")
                     .font(.caption2.weight(.heavy))
-                    .tracking(1.35)
+                    .tracking(1.05)
                     .foregroundStyle(NukeTheme.orange)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
 
-            Spacer()
+            Spacer(minLength: 8)
 
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("PRIVATE LEDGER")
-                    .font(.caption2.weight(.heavy))
-                    .tracking(0.9)
-                    .foregroundStyle(NukeTheme.cyan)
-                Text(profile.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "READY FOR ACTION" : profile.displayName)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(NukeTheme.muted)
-                    .lineLimit(1)
-            }
+            NukeStatusPill(title: "Live", color: NukeTheme.cyan, symbol: "bolt.fill")
+                .fixedSize(horizontal: true, vertical: false)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var periodRail: some View {

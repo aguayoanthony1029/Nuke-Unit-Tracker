@@ -9,22 +9,34 @@ struct RootTabView: View {
     @State private var isAddingBet = false
 
     var body: some View {
-        Group {
-            switch selection {
-            case .home: DashboardView(profile: profile)
-            case .bets: BetsView()
-            case .stats: StatsView()
-            case .profile: ProfileView(profile: profile)
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        // Keep one full-screen layout owner. Applying a safe-area inset directly to
+        // a conditional Group can make a selected NavigationStack adopt its content
+        // height on newer simulator runtimes, leaving the command center floating.
+        ZStack(alignment: .bottom) {
+            selectedScreen
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaPadding(.bottom, 84)
+
             NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
+                .padding(.bottom, 4)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(NukeTheme.background)
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(isPresented: $isAddingBet) {
             AddBetView()
         }
         .task { await SlipAttachmentStore.shared.retryPendingUploads(attachments, in: modelContext) }
+    }
+
+    @ViewBuilder
+    private var selectedScreen: some View {
+        switch selection {
+        case .home: DashboardView(profile: profile)
+        case .bets: BetsView()
+        case .stats: StatsView()
+        case .profile: ProfileView(profile: profile)
+        }
     }
 }
 
