@@ -5,8 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: community-service } }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with: { node-version: 22, cache: npm, cache-dependency-path: community-service/package-lock.json }
       - run: npm ci
       - run: npm run build
@@ -14,7 +14,19 @@ jobs:
   ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: brew install xcodegen
-      - run: xcodegen generate
-      - run: xcodebuild -project NukeUnitTracker.xcodeproj -scheme NukeUnitTracker -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' test CODE_SIGNING_ALLOWED=NO
+      - uses: actions/checkout@v5
+      - name: Remove runner tap that Homebrew no longer trusts
+        run: brew untap aws/tap || true
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Select an available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          device_id="$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ && /Shutdown/ { print $2; exit }')"
+          test -n "$device_id"
+          echo "id=$device_id" >> "$GITHUB_OUTPUT"
+      - name: Run iOS tests
+        run: xcodebuild -project NukeUnitTracker.xcodeproj -scheme NukeUnitTracker -sdk iphonesimulator -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}" test CODE_SIGNING_ALLOWED=NO
