@@ -85,7 +85,7 @@ struct StatsView: View {
     private func statCell<F: FormatStyle>(_ label: String, _ value: F.FormatInput, format: F, color: Color) -> some View where F.FormatOutput == String {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.caption2.weight(.bold)).foregroundStyle(NukeTheme.muted)
-            Text(value, format: format).font(.subheadline.weight(.black)).foregroundStyle(color)
+            Text(format.format(value)).font(.subheadline.weight(.black)).foregroundStyle(color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

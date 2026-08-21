@@ -117,7 +117,7 @@ struct DashboardView: View {
         NukeCard {
             VStack(alignment: .leading, spacing: 5) {
                 Text(title).font(.caption2.weight(.bold)).foregroundStyle(NukeTheme.muted)
-                Text(value, format: format).font(.title3.bold()).foregroundStyle(color)
+                Text(format.format(value)).font(.title3.bold()).foregroundStyle(color)
             }
         }
     }
