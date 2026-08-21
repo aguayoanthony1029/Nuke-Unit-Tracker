@@ -9,17 +9,15 @@ struct RootTabView: View {
     @State private var isAddingBet = false
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Group {
-                switch selection {
-                case .home: DashboardView(profile: profile)
-                case .bets: BetsView()
-                case .stats: StatsView()
-                case .profile: ProfileView(profile: profile)
-                }
+        Group {
+            switch selection {
+            case .home: DashboardView(profile: profile)
+            case .bets: BetsView()
+            case .stats: StatsView()
+            case .profile: ProfileView(profile: profile)
             }
-            .padding(.bottom, 74)
-
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -61,13 +59,18 @@ private struct NukeTabBar: View {
             tabButton(.home)
             tabButton(.bets)
             Button(action: addAction) {
-                Image(systemName: "plus")
-                    .font(.title2.bold())
+                VStack(spacing: 1) {
+                    Image(systemName: "plus")
+                        .font(.title3.bold())
+                    Text("LOG")
+                        .font(.caption2.weight(.black))
+                        .tracking(0.7)
+                }
                     .foregroundStyle(.black)
-                    .frame(width: 58, height: 58)
+                    .frame(width: 64, height: 64)
                     .background(Circle().fill(NukeTheme.orange).shadow(color: NukeTheme.orange.opacity(0.5), radius: 14))
             }
-            .accessibilityLabel("Add bet")
+            .accessibilityLabel("Log a bet")
             tabButton(.stats)
             tabButton(.profile)
         }

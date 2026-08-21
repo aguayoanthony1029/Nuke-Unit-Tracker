@@ -49,9 +49,17 @@ struct DashboardView: View {
                     }
                 }
                 Spacer()
-                Text("Hi, \(profile.displayName)")
-                    .font(.subheadline)
-                    .foregroundStyle(NukeTheme.muted)
+                if profile.displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("BOARD READY")
+                        .font(.caption.weight(.heavy))
+                        .tracking(1)
+                        .foregroundStyle(NukeTheme.cyan)
+                } else {
+                    Text("Welcome, \(profile.displayName)")
+                        .font(.subheadline)
+                        .foregroundStyle(NukeTheme.muted)
+                        .lineLimit(1)
+                }
             }
             HStack(spacing: 8) {
                 NavigationLink {

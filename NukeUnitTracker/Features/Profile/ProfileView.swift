@@ -15,7 +15,10 @@ struct ProfileView: View {
         NavigationStack {
             Form {
                 Section("PROFILE") {
-                    TextField("Display name", text: $profile.displayName)
+                    TextField("Callsign (optional)", text: $profile.displayName)
+                    Text("Only used for the greeting on this device. Leave it blank if you prefer.")
+                        .font(.footnote)
+                        .foregroundStyle(NukeTheme.muted)
                     HStack { Text("Unit value"); Spacer(); TextField("Unit value", value: $profile.unitValue, format: .currency(code: "USD")).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
                     Picker("Odds format", selection: $profile.oddsFormatRaw) { ForEach(OddsFormat.allCases) { Text($0.label).tag($0.rawValue) } }
                 }
