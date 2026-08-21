@@ -3,7 +3,13 @@ import SwiftData
 
 enum PersistenceController {
     static func makeContainer(inMemory: Bool = false) -> ModelContainer {
-        let schema = Schema([UserProfile.self, Bet.self, BetLeg.self, SlipAttachment.self])
+        let schema = Schema([
+            UserProfile.self,
+            Bet.self,
+            BetLeg.self,
+            SlipAttachment.self,
+            TailBoardItem.self
+        ])
         let configuration = ModelConfiguration(
             "NukeUnitTracker",
             schema: schema,
@@ -14,4 +20,3 @@ enum PersistenceController {
         catch { fatalError("Unable to initialize private tracker storage: \(error.localizedDescription)") }
     }
 }
-

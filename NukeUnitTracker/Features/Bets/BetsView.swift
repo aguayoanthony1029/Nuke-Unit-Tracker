@@ -7,6 +7,8 @@ struct BetsView: View {
     @State private var search = ""
     @State private var selectedSport = "All"
     @State private var selectedResult = "All"
+    @State private var selectedSportsbook = "All"
+    @State private var selectedRange: HistoryRange = .allTime
     @State private var exportItem: ExportItem?
     @State private var betToDelete: Bet?
 
@@ -14,10 +16,14 @@ struct BetsView: View {
         bets.filter { bet in
             (selectedSport == "All" || bet.sport == selectedSport) &&
             (selectedResult == "All" || bet.resultRaw == selectedResult.lowercased()) &&
+            (selectedSportsbook == "All" ||
+             (selectedSportsbook == "No sportsbook" ? bet.sportsbook.isEmpty : bet.sportsbook == selectedSportsbook)) &&
+            selectedRange.contains(bet.placedAt) &&
             (search.isEmpty || bet.title.localizedCaseInsensitiveContains(search) || bet.sportsbook.localizedCaseInsensitiveContains(search))
         }
     }
     private var sports: [String] { ["All"] + Array(Set(bets.map(\.sport))).sorted() }
+    private var sportsbooks: [String] { ["All", "No sportsbook"] + Array(Set(bets.map(\.sportsbook).filter { !$0.isEmpty })).sorted() }
 
     var body: some View {
         NavigationStack {
@@ -25,6 +31,8 @@ struct BetsView: View {
                 Section {
                     Picker("Sport", selection: $selectedSport) { ForEach(sports, id: \.self) { Text($0) } }.pickerStyle(.menu)
                     Picker("Result", selection: $selectedResult) { ForEach(["All"] + BetResult.allCases.map(\.label), id: \.self) { Text($0) } }.pickerStyle(.menu)
+                    Picker("Sportsbook", selection: $selectedSportsbook) { ForEach(sportsbooks, id: \.self) { Text($0) } }.pickerStyle(.menu)
+                    Picker("Date range", selection: $selectedRange) { ForEach(HistoryRange.allCases) { Text($0.label).tag($0) } }.pickerStyle(.menu)
                 }
                 ForEach(groupedBets, id: \.key) { day, dayBets in
                     Section(day.formatted(date: .abbreviated, time: .omitted).uppercased()) {
@@ -62,6 +70,32 @@ struct BetsView: View {
         attachments.forEach { SlipAttachmentStore.shared.removeLocalFile(for: $0); modelContext.delete($0) }
         legs.forEach(modelContext.delete)
         modelContext.delete(bet)
+    }
+}
+
+private enum HistoryRange: String, CaseIterable, Identifiable {
+    case allTime, today, thisWeek, thisMonth, thisYear
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .allTime: "All time"
+        case .today: "Today"
+        case .thisWeek: "This week"
+        case .thisMonth: "This month"
+        case .thisYear: "This year"
+        }
+    }
+
+    func contains(_ date: Date, reference: Date = .now, calendar: Calendar = .current) -> Bool {
+        switch self {
+        case .allTime: true
+        case .today: calendar.isDate(date, inSameDayAs: reference)
+        case .thisWeek: calendar.isDate(date, equalTo: reference, toGranularity: .weekOfYear)
+        case .thisMonth: calendar.isDate(date, equalTo: reference, toGranularity: .month)
+        case .thisYear: calendar.isDate(date, equalTo: reference, toGranularity: .year)
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 import CloudKit
+import SwiftData
 
 @MainActor
 final class SlipAttachmentStore {
@@ -50,10 +51,11 @@ final class SlipAttachmentStore {
         return recordID.recordName
     }
 
-    func retryPendingUploads(_ attachments: [SlipAttachment]) async {
+    func retryPendingUploads(_ attachments: [SlipAttachment], in modelContext: ModelContext) async {
         for attachment in attachments where attachment.cloudRecordName == nil {
             if let recordName = try? await uploadToPrivateCloud(attachment) { attachment.cloudRecordName = recordName }
         }
+        try? modelContext.save()
     }
 
     func removeLocalFile(for attachment: SlipAttachment) {
