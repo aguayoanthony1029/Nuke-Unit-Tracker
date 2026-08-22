@@ -13,23 +13,32 @@ struct DashboardView: View {
     private var performanceColor: Color { summary.netUnits >= 0 ? NukeTheme.green : NukeTheme.red }
 
     var body: some View {
-        NavigationStack {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 15) {
-                    commandHeader
-                    periodRail
-                    unitConsole
-                    metricGrid
-                    UnitsChart(bets: filtered, netUnits: summary.netUnits)
-                    FreePicksPreview { isShowingFeed = true }
-                    recentBets
+        GeometryReader { proxy in
+            ZStack {
+                NukeCommandBackdrop()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 15) {
+                        commandHeader
+                        periodRail
+                        unitConsole
+                        metricGrid
+                        UnitsChart(bets: filtered, netUnits: summary.netUnits)
+                        FreePicksPreview { isShowingFeed = true }
+                        recentBets
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 22)
+                    .frame(minHeight: proxy.size.height, alignment: .top)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 22)
             }
-            .background(NukeCommandBackdrop())
-            .navigationDestination(isPresented: $isShowingFeed) { FreePicksView() }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .sheet(isPresented: $isShowingFeed) {
+            NavigationStack {
+                FreePicksView()
+            }
         }
     }
 
