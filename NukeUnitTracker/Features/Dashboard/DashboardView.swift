@@ -7,34 +7,30 @@ struct DashboardView: View {
     @Query(sort: \Bet.placedAt, order: .reverse) private var bets: [Bet]
     @State private var period: Period = .month
     @State private var isShowingFeed = false
+    @ScaledMetric(relativeTo: .title) private var brandMarkSize = 38
+    @ScaledMetric(relativeTo: .largeTitle) private var netUnitsFontSize = 48
 
     private var filtered: [Bet] { StatisticsService.filtered(bets, period: period) }
     private var summary: DashboardSummary { StatisticsService.summary(for: filtered) }
     private var performanceColor: Color { summary.netUnits >= 0 ? NukeTheme.green : NukeTheme.red }
 
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                NukeCommandBackdrop()
-
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 15) {
-                        commandHeader
-                        periodRail
-                        unitConsole
-                        metricGrid
-                        UnitsChart(bets: filtered, netUnits: summary.netUnits)
-                        FreePicksPreview { isShowingFeed = true }
-                        recentBets
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 22)
-                    .frame(minHeight: proxy.size.height, alignment: .top)
-                }
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 16) {
+                commandHeader
+                periodRail
+                unitConsole
+                metricGrid
+                UnitsChart(bets: filtered, netUnits: summary.netUnits)
+                FreePicksPreview { isShowingFeed = true }
+                recentBets
             }
-            .frame(width: proxy.size.width, height: proxy.size.height)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 28)
         }
+        .background(NukeCommandBackdrop())
         .sheet(isPresented: $isShowingFeed) {
             NavigationStack {
                 FreePicksView()
@@ -43,32 +39,53 @@ struct DashboardView: View {
     }
 
     private var commandHeader: some View {
+        ViewThatFits(in: .horizontal) {
+            commandHeaderRow
+            VStack(alignment: .leading, spacing: 10) {
+                brandIdentity
+                HStack {
+                    Spacer()
+                    liveStatus
+                }
+            }
+        }
+    }
+
+    private var commandHeaderRow: some View {
+        HStack(spacing: 11) {
+            brandIdentity
+
+            Spacer(minLength: 8)
+
+            liveStatus
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var brandIdentity: some View {
         HStack(spacing: 11) {
             Image("BrandMark")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 38, height: 38)
+                .frame(width: brandMarkSize, height: brandMarkSize)
                 .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(NukeTheme.orange.opacity(0.6), lineWidth: 1))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("NUKE")
-                    .font(.system(size: 20, weight: .black, design: .rounded))
+                    .font(.title3.weight(.black))
                     .tracking(1.5)
                 Text("COMMAND CENTER")
                     .font(.caption2.weight(.heavy))
                     .tracking(1.05)
                     .foregroundStyle(NukeTheme.orange)
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-
-            Spacer(minLength: 8)
-
-            NukeStatusPill(title: "Live", color: NukeTheme.cyan, symbol: "bolt.fill")
-                .fixedSize(horizontal: true, vertical: false)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var liveStatus: some View {
+        NukeStatusPill(title: "Live", color: NukeTheme.cyan, symbol: "bolt.fill")
+            .fixedSize(horizontal: true, vertical: false)
     }
 
     private var periodRail: some View {
@@ -95,54 +112,41 @@ struct DashboardView: View {
     }
 
     private var unitConsole: some View {
-        ZStack(alignment: .bottomLeading) {
-            Image("CommandCenterHero")
-                .resizable()
-                .scaledToFill()
-                .frame(height: 215)
-                .clipped()
-                .opacity(0.28)
-            LinearGradient(
-                colors: [NukeTheme.abyss.opacity(0.25), NukeTheme.abyss.opacity(0.9)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            RadialGradient(
-                colors: [NukeTheme.cyan.opacity(0.20), .clear],
-                center: .bottomTrailing,
-                startRadius: 5,
-                endRadius: 250
-            )
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Label("NET UNITS", systemImage: "bolt.horizontal.circle.fill")
-                        .font(.caption.weight(.heavy))
-                        .tracking(1.1)
-                        .foregroundStyle(NukeTheme.cyan)
-                    Spacer()
-                    NukeStatusPill(
-                        title: summary.netUnits >= 0 ? "Signal positive" : "Review tape",
-                        color: performanceColor,
-                        symbol: summary.netUnits >= 0 ? "arrow.up.right" : "arrow.down.right"
-                    )
-                }
-                Text(summary.netUnits.unitText)
-                    .font(.system(size: 52, weight: .black, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(performanceColor)
-                    .shadow(color: performanceColor.opacity(0.38), radius: 12)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top) {
+                Label("NET UNITS", systemImage: "bolt.horizontal.circle.fill")
+                    .font(.caption.weight(.heavy))
+                    .tracking(1.1)
+                    .foregroundStyle(NukeTheme.cyan)
+                Spacer(minLength: 8)
+                NukeStatusPill(
+                    title: summary.netUnits >= 0 ? "Signal positive" : "Review tape",
+                    color: performanceColor,
+                    symbol: summary.netUnits >= 0 ? "arrow.up.right" : "arrow.down.right"
+                )
+                .fixedSize(horizontal: true, vertical: false)
+            }
+            ViewThatFits(in: .horizontal) {
+                unitValueText(font: .system(size: netUnitsFontSize, weight: .black, design: .rounded))
+                unitValueText(font: .largeTitle.weight(.black))
+            }
+            ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
                     Text("\(summary.netUnits * profile.unitValue, format: .currency(code: "USD"))")
                     Text("|")
                     Text("\(summary.record.label) RECORD")
                 }
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.white.opacity(0.78))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(summary.netUnits * profile.unitValue, format: .currency(code: "USD"))")
+                    Text("\(summary.record.label) RECORD")
+                }
             }
-            .padding(17)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.white.opacity(0.78))
         }
-        .frame(height: 215)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .background { unitConsoleBackdrop }
         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(NukeTheme.cyan.opacity(0.46), lineWidth: 1.2))
         .shadow(color: NukeTheme.cyan.opacity(0.12), radius: 18, y: 7)
@@ -151,7 +155,7 @@ struct DashboardView: View {
     }
 
     private var metricGrid: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 9), count: 3), spacing: 9) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 10)], spacing: 10) {
             CommandMetric(label: "RECORD", value: summary.record.label, detail: "W-L-P", symbol: "checklist", color: NukeTheme.cyan)
             CommandMetric(label: "WIN RATE", value: summary.winRate.formatted(.percent.precision(.fractionLength(1))), detail: "SETTLED BETS", symbol: "scope", color: NukeTheme.green)
             CommandMetric(label: "STREAK", value: summary.streak, detail: "CURRENT RUN", symbol: "flame.fill", color: NukeTheme.ember)
@@ -173,11 +177,44 @@ struct DashboardView: View {
                             systemImage: "plus.circle.fill",
                             description: Text("Hit LOG below to record your first bet in seconds.")
                         )
-                        .frame(height: 130)
+                        .padding(.vertical, 28)
                     }
                 }
             }
         }
+    }
+
+    private var unitConsoleBackdrop: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image("CommandCenterHero")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+                    .opacity(0.28)
+                LinearGradient(
+                    colors: [NukeTheme.abyss.opacity(0.25), NukeTheme.abyss.opacity(0.9)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                RadialGradient(
+                    colors: [NukeTheme.cyan.opacity(0.20), .clear],
+                    center: .bottomTrailing,
+                    startRadius: 5,
+                    endRadius: max(proxy.size.width, proxy.size.height)
+                )
+            }
+        }
+    }
+
+    private func unitValueText(font: Font) -> some View {
+        Text(summary.netUnits.unitText)
+            .font(font)
+            .monospacedDigit()
+            .foregroundStyle(performanceColor)
+            .shadow(color: performanceColor.opacity(0.38), radius: 12)
+            .lineLimit(1)
     }
 }
 
@@ -199,20 +236,17 @@ private struct CommandMetric: View {
                 .font(.caption2.weight(.heavy))
                 .tracking(0.7)
                 .foregroundStyle(NukeTheme.muted)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .lineLimit(2)
             Text(value)
-                .font(.system(size: 20, weight: .black, design: .rounded))
+                .font(.headline.weight(.black))
                 .monospacedDigit()
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.68)
             Text(detail)
-                .font(.system(size: 8, weight: .bold, design: .rounded))
+                .font(.caption2.weight(.bold))
                 .tracking(0.5)
                 .foregroundStyle(color.opacity(0.88))
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
+                .lineLimit(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
@@ -224,6 +258,10 @@ private struct CommandMetric: View {
 private struct UnitsChart: View {
     let bets: [Bet]
     let netUnits: Double
+
+    private var points: [(Date, Double)] {
+        StatisticsService.cumulativePoints(for: bets.filter { $0.result != .pending })
+    }
 
     var body: some View {
         NukeCard {
@@ -244,36 +282,41 @@ private struct UnitsChart: View {
                         .monospacedDigit()
                         .foregroundStyle(netUnits >= 0 ? NukeTheme.green : NukeTheme.red)
                 }
-                let points = StatisticsService.cumulativePoints(for: bets.filter { $0.result != .pending })
-                if points.isEmpty {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(NukeTheme.abyss.opacity(0.55))
-                        VStack(spacing: 8) {
-                            Image(systemName: "chart.line.uptrend.xyaxis")
-                                .font(.title2.weight(.black))
-                                .foregroundStyle(NukeTheme.cyan)
-                            Text("Your first settled bet powers the curve.")
-                                .font(.caption)
-                                .foregroundStyle(NukeTheme.muted)
-                        }
-                    }
-                    .frame(height: 170)
-                } else {
-                    Chart(points, id: \.0) { point in
-                        AreaMark(x: .value("Date", point.0), y: .value("Units", point.1))
-                            .foregroundStyle(LinearGradient(colors: [NukeTheme.cyan.opacity(0.32), .clear], startPoint: .top, endPoint: .bottom))
-                            .interpolationMethod(.catmullRom)
-                        LineMark(x: .value("Date", point.0), y: .value("Units", point.1))
-                            .foregroundStyle(NukeTheme.cyan)
-                            .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                            .interpolationMethod(.catmullRom)
-                    }
-                    .frame(height: 170)
-                    .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
-                    .chartYAxis { AxisMarks(position: .leading) }
+                chartPlot
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(1.8, contentMode: .fit)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var chartPlot: some View {
+        if points.isEmpty {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(NukeTheme.abyss.opacity(0.55))
+                VStack(spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.title2.weight(.black))
+                        .foregroundStyle(NukeTheme.cyan)
+                    Text("Your first settled bet powers the curve.")
+                        .font(.caption)
+                        .foregroundStyle(NukeTheme.muted)
+                        .multilineTextAlignment(.center)
                 }
             }
+        } else {
+            Chart(points, id: \.0) { point in
+                AreaMark(x: .value("Date", point.0), y: .value("Units", point.1))
+                    .foregroundStyle(LinearGradient(colors: [NukeTheme.cyan.opacity(0.32), .clear], startPoint: .top, endPoint: .bottom))
+                    .interpolationMethod(.catmullRom)
+                LineMark(x: .value("Date", point.0), y: .value("Units", point.1))
+                    .foregroundStyle(NukeTheme.cyan)
+                    .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                    .interpolationMethod(.catmullRom)
+            }
+            .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
+            .chartYAxis { AxisMarks(position: .leading) }
         }
     }
 }

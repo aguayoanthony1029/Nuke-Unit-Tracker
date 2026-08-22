@@ -6,39 +6,45 @@ struct FreePicksPreview: View {
 
     var body: some View {
         Button(action: openFeed) {
-            ZStack(alignment: .bottomLeading) {
-                Image("CommandCenterHero")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 168)
-                    .clipped()
-                    .opacity(0.68)
-                LinearGradient(colors: [.clear, NukeTheme.abyss.opacity(0.96)], startPoint: .top, endPoint: .bottom)
-                VStack(alignment: .leading, spacing: 7) {
-                    HStack {
-                        NukeStatusPill(title: feed.isShowingLocalBriefing ? "Field manual" : "Free signal", color: NukeTheme.cyan, symbol: "antenna.radiowaves.left.and.right")
-                        Spacer()
-                        Image(systemName: "arrow.right.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(NukeTheme.orange)
-                    }
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    NukeStatusPill(title: feed.isShowingLocalBriefing ? "Field manual" : "Free signal", color: NukeTheme.cyan, symbol: "antenna.radiowaves.left.and.right")
                     Spacer()
-                    Text("NUKE FREE PICKS + INTEL")
-                        .font(.headline.weight(.black))
-                        .tracking(0.5)
-                    Text(feed.posts.first?.summary ?? "Open the command feed for free picks, Nuke intel, and daily briefings.")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.8))
-                        .lineLimit(2)
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(NukeTheme.orange)
                 }
-                .padding(15)
+                Text("NUKE FREE PICKS + INTEL")
+                    .font(.headline.weight(.black))
+                    .tracking(0.5)
+                Text(feed.posts.first?.summary ?? "Open the command feed for free picks, Nuke intel, and daily briefings.")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background { previewBackdrop }
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 18).stroke(NukeTheme.cyan.opacity(0.3)))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Open Nuke Free Picks and Intel")
         .task { await feed.load() }
+    }
+
+    private var previewBackdrop: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Image("CommandCenterHero")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+                    .opacity(0.68)
+                LinearGradient(colors: [.clear, NukeTheme.abyss.opacity(0.96)], startPoint: .top, endPoint: .bottom)
+            }
+        }
     }
 }
 
