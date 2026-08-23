@@ -14,7 +14,8 @@ struct AppEntryView: View {
                 OnboardingView()
             }
         }
-        .background(NukeTheme.background)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(NukeTheme.background, ignoresSafeAreaEdges: .all)
         .onOpenURL { url in
             guard let profile = profiles.first else { return }
             Task { @MainActor in

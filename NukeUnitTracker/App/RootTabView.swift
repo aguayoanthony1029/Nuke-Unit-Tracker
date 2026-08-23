@@ -9,19 +9,19 @@ struct RootTabView: View {
     @State private var isAddingBet = false
 
     var body: some View {
-        // Keep one full-screen layout owner. Applying a safe-area inset directly to
-        // a conditional Group can make a selected NavigationStack adopt its content
-        // height on newer simulator runtimes, leaving the command center floating.
-        ZStack(alignment: .bottom) {
+        // The root owns the viewport, background, and safe-area reservation.
+        // Individual tabs only own their scrollable content.
+        ZStack {
+            NukeCommandBackdrop()
+
             selectedScreen
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .safeAreaPadding(.bottom, 84)
-
-            NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
-                .padding(.bottom, 4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(NukeTheme.background)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
+        }
+        .background(NukeTheme.background, ignoresSafeAreaEdges: .all)
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(isPresented: $isAddingBet) {
             AddBetView()

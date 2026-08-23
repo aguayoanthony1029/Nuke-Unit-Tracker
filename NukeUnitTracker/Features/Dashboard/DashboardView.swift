@@ -30,7 +30,6 @@ struct DashboardView: View {
             .padding(.top, 12)
             .padding(.bottom, 28)
         }
-        .background(NukeCommandBackdrop())
         .sheet(isPresented: $isShowingFeed) {
             NavigationStack {
                 FreePicksView()
