@@ -35,6 +35,11 @@
     <string>$(VAULT_VERIFICATION_ENABLED)</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Choose up to three slip photos to attach to a tracked bet.</string>
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string>LaunchBackground</string>
+    </dict>
     <key>UIBackgroundModes</key>
     <array>
         <string>remote-notification</string>
