@@ -17,6 +17,7 @@ struct AppEntryView: View {
                 OnboardingView()
             }
         }
+        .environment(\.font, NukeTheme.bodyFont())
         .onOpenURL { url in
             guard let profile = profiles.first else { return }
             Task { @MainActor in

@@ -3,6 +3,42 @@ import SwiftUI
 enum NukeTheme {
     // MARK: - Visual Lab palette
 
+    private static let rajdhaniRegular = "Rajdhani-Regular"
+    private static let rajdhaniSemiBold = "Rajdhani-SemiBold"
+    private static let rajdhaniBold = "Rajdhani-Bold"
+
+    /// Industrial display face for screen titles and major section headings.
+    static func titleFont(
+        size: CGFloat = 28,
+        relativeTo textStyle: Font.TextStyle = .title
+    ) -> Font {
+        .custom(rajdhaniBold, size: size, relativeTo: textStyle)
+    }
+
+    /// Squared technical face for unit totals, records, and chart values.
+    static func dataFont(
+        size: CGFloat = 36,
+        relativeTo textStyle: Font.TextStyle = .largeTitle
+    ) -> Font {
+        .custom(rajdhaniSemiBold, size: size, relativeTo: textStyle)
+    }
+
+    /// Compact uppercase face for card labels and HUD readouts.
+    static func headerFont(
+        size: CGFloat = 13,
+        relativeTo textStyle: Font.TextStyle = .caption
+    ) -> Font {
+        .custom(rajdhaniBold, size: size, relativeTo: textStyle)
+    }
+
+    /// Readable Rajdhani body face used as the app-wide default.
+    static func bodyFont(
+        size: CGFloat = 17,
+        relativeTo textStyle: Font.TextStyle = .body
+    ) -> Font {
+        .custom(rajdhaniRegular, size: size, relativeTo: textStyle)
+    }
+
     /// #0B0E14 - the deepest command-center background.
     static let bgBase = Color(
         red: 11.0 / 255.0,
@@ -108,6 +144,22 @@ extension View {
 
     func neonGlow(color: Color) -> some View {
         modifier(NeonGlow(color: color))
+    }
+
+    func nukeTitleFont(size: CGFloat = 28) -> some View {
+        font(NukeTheme.titleFont(size: size))
+    }
+
+    func nukeDataFont(size: CGFloat = 36) -> some View {
+        font(NukeTheme.dataFont(size: size))
+    }
+
+    func nukeHeaderFont(size: CGFloat = 13) -> some View {
+        font(NukeTheme.headerFont(size: size))
+    }
+
+    func nukeBodyFont(size: CGFloat = 17) -> some View {
+        font(NukeTheme.bodyFont(size: size))
     }
 }
 

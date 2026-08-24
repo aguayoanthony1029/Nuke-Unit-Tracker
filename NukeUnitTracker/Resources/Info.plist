@@ -35,6 +35,12 @@
     <string>$(VAULT_VERIFICATION_ENABLED)</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Choose up to three slip photos to attach to a tracked bet.</string>
+    <key>UIAppFonts</key>
+    <array>
+        <string>Rajdhani-Regular.ttf</string>
+        <string>Rajdhani-SemiBold.ttf</string>
+        <string>Rajdhani-Bold.ttf</string>
+    </array>
     <key>UILaunchScreen</key>
     <dict>
         <key>UIColorName</key>
