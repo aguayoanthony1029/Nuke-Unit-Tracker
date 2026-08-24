@@ -12,16 +12,16 @@ struct RootTabView: View {
         // The root owns the viewport, background, and safe-area reservation.
         // Individual tabs only own their scrollable content.
         ZStack {
+            NukeTheme.background
+                .ignoresSafeArea()
+
             NukeCommandBackdrop()
 
             selectedScreen
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
         }
-        .background(NukeTheme.background, ignoresSafeAreaEdges: .all)
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(isPresented: $isAddingBet) {
             AddBetView()

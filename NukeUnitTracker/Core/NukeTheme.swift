@@ -82,7 +82,6 @@ struct NukeCommandBackdrop: View {
                 context.stroke(grid, with: .color(NukeTheme.cyan.opacity(0.035)), lineWidth: 0.5)
             }
         }
-        .ignoresSafeArea()
         .accessibilityHidden(true)
     }
 }
