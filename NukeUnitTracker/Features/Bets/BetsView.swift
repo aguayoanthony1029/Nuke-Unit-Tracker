@@ -28,12 +28,6 @@ struct BetsView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    Picker("Sport", selection: $selectedSport) { ForEach(sports, id: \.self) { Text($0) } }.pickerStyle(.menu)
-                    Picker("Result", selection: $selectedResult) { ForEach(["All"] + BetResult.allCases.map(\.label), id: \.self) { Text($0) } }.pickerStyle(.menu)
-                    Picker("Sportsbook", selection: $selectedSportsbook) { ForEach(sportsbooks, id: \.self) { Text($0) } }.pickerStyle(.menu)
-                    Picker("Date range", selection: $selectedRange) { ForEach(HistoryRange.allCases) { Text($0.label).tag($0) } }.pickerStyle(.menu)
-                }
                 ForEach(groupedBets, id: \.key) { day, dayBets in
                     Section(day.formatted(date: .abbreviated, time: .omitted).uppercased()) {
                         ForEach(dayBets) { bet in
@@ -51,6 +45,29 @@ struct BetsView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Export") { if let url = try? ExportService.writeCSV(bets: shownBets) { exportItem = ExportItem(url: url) } }.disabled(shownBets.isEmpty)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Picker("Sport", selection: $selectedSport) {
+                            ForEach(sports, id: \.self) { Text($0) }
+                        }
+                        Picker("Result", selection: $selectedResult) {
+                            ForEach(["All"] + BetResult.allCases.map(\.label), id: \.self) { Text($0) }
+                        }
+                        Picker("Sportsbook", selection: $selectedSportsbook) {
+                            ForEach(sportsbooks, id: \.self) { Text($0) }
+                        }
+                        Picker("Date range", selection: $selectedRange) {
+                            ForEach(HistoryRange.allCases) { Text($0.label).tag($0) }
+                        }
+                        if hasActiveFilters {
+                            Divider()
+                            Button("Clear filters") { clearFilters() }
+                        }
+                    } label: {
+                        Image(systemName: hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                    }
+                    .accessibilityLabel("Filter bets")
+                }
             }
             .sheet(item: $exportItem) { item in ShareSheet(url: item.url) }
             .alert("Delete this bet?", isPresented: Binding(get: { betToDelete != nil }, set: { if !$0 { betToDelete = nil } })) {
@@ -63,6 +80,18 @@ struct BetsView: View {
     private var groupedBets: [(key: Date, value: [Bet])] {
         Dictionary(grouping: shownBets) { Calendar.current.startOfDay(for: $0.placedAt) }.sorted { $0.key > $1.key }
     }
+
+    private var hasActiveFilters: Bool {
+        selectedSport != "All" || selectedResult != "All" || selectedSportsbook != "All" || selectedRange != .allTime
+    }
+
+    private func clearFilters() {
+        selectedSport = "All"
+        selectedResult = "All"
+        selectedSportsbook = "All"
+        selectedRange = .allTime
+    }
+
     private func delete(_ bet: Bet) {
         let id = bet.id
         let legs = (try? modelContext.fetch(FetchDescriptor<BetLeg>(predicate: #Predicate { $0.betID == id }))) ?? []

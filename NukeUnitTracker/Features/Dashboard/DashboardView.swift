@@ -6,7 +6,7 @@ struct DashboardView: View {
     let profile: UserProfile
     @Query(sort: \Bet.placedAt, order: .reverse) private var bets: [Bet]
     @State private var period: Period = .month
-    @State private var isShowingFeed = false
+    @State private var isShowingCommunity = false
     @ScaledMetric(relativeTo: .title) private var brandMarkSize = 38
     @ScaledMetric(relativeTo: .largeTitle) private var netUnitsFontSize = 48
 
@@ -22,7 +22,7 @@ struct DashboardView: View {
                 unitConsole
                 metricGrid
                 UnitsChart(bets: filtered, netUnits: summary.netUnits)
-                FreePicksPreview { isShowingFeed = true }
+                NukeCommunityInvite { isShowingCommunity = true }
                 recentBets
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -30,9 +30,9 @@ struct DashboardView: View {
             .padding(.top, 12)
             .padding(.bottom, 28)
         }
-        .sheet(isPresented: $isShowingFeed) {
+        .sheet(isPresented: $isShowingCommunity) {
             NavigationStack {
-                FreePicksView()
+                NukeCommunityView()
             }
         }
     }

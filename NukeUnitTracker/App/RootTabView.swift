@@ -17,7 +17,14 @@ struct RootTabView: View {
 
             NukeCommandBackdrop()
 
-            selectedScreen
+            GeometryReader { viewport in
+                selectedScreen
+                    .frame(
+                        width: viewport.size.width,
+                        height: viewport.size.height,
+                        alignment: .top
+                    )
+            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             NukeTabBar(selection: $selection, addAction: { isAddingBet = true })

@@ -145,30 +145,17 @@ struct TailBoardView: View {
                     .background(NukeTheme.cyan.opacity(0.13), in: Circle())
                 Text("Your board is clear")
                     .font(.title3.weight(.black))
-                Text("Open Free Picks to save published selections, or build a private board from your own notes.")
+                Text("Build a private board from your own notes. You can save it, copy it, or share it when you are ready.")
                     .font(.subheadline)
                     .foregroundStyle(NukeTheme.muted)
                     .multilineTextAlignment(.center)
-                HStack(spacing: 10) {
-                    NavigationLink {
-                        FreePicksView()
-                    } label: {
-                        Label("Browse free picks", systemImage: "antenna.radiowaves.left.and.right")
-                    }
-                    .buttonStyle(NukeActionButtonStyle(tint: NukeTheme.orange))
-
-                    Button {
-                        isShowingManualPick = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.headline.bold())
-                            .frame(width: 46)
-                            .padding(.vertical, 13)
-                    }
-                    .foregroundStyle(NukeTheme.cyan)
-                    .background(NukeTheme.cyan.opacity(0.12), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    .accessibilityLabel("Add a manual selection")
+                Button {
+                    isShowingManualPick = true
+                } label: {
+                    Label("ADD A SELECTION", systemImage: "plus")
                 }
+                .buttonStyle(NukeActionButtonStyle(tint: NukeTheme.orange))
+                .accessibilityLabel("Add a manual selection")
             }
             .padding(.vertical, 10)
         }

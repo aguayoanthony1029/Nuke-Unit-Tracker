@@ -1,23 +1,22 @@
 import SwiftUI
 
-struct FreePicksPreview: View {
-    let openFeed: () -> Void
-    @StateObject private var feed = NukeContentFeedViewModel(visibility: .free)
+struct NukeCommunityInvite: View {
+    let openCommunity: () -> Void
 
     var body: some View {
-        Button(action: openFeed) {
+        Button(action: openCommunity) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    NukeStatusPill(title: feed.isShowingLocalBriefing ? "Field manual" : "Free signal", color: NukeTheme.cyan, symbol: "antenna.radiowaves.left.and.right")
+                    NukeStatusPill(title: "Community access", color: NukeTheme.cyan, symbol: "person.3.fill")
                     Spacer()
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.title3)
                         .foregroundStyle(NukeTheme.orange)
                 }
-                Text("NUKE FREE PICKS + INTEL")
+                Text("JOIN THE NUKE SPORTS BETS COMMUNITY FOR EXPERT PICKS!")
                     .font(.headline.weight(.black))
                     .tracking(0.5)
-                Text(feed.posts.first?.summary ?? "Open the command feed for free picks, Nuke intel, and daily briefings.")
+                Text("Expert picks, AI-powered tools, and a community built for the board.")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.8))
                     .fixedSize(horizontal: false, vertical: true)
@@ -29,8 +28,7 @@ struct FreePicksPreview: View {
             .overlay(RoundedRectangle(cornerRadius: 18).stroke(NukeTheme.cyan.opacity(0.3)))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Open Nuke Free Picks and Intel")
-        .task { await feed.load() }
+        .accessibilityLabel("Join the Nuke Sports Bets Community")
     }
 
     private var previewBackdrop: some View {
@@ -48,7 +46,93 @@ struct FreePicksPreview: View {
     }
 }
 
+struct NukeCommunityView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    private let membershipURL = URL(string: "https://whop.com/checkout/plan_0Rv2LNrHJZPKw?a=spooky47crypto")!
+
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 18) {
+                communityHero
+
+                NukeCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Want access to expert picks and a community of like-minded sports bettors?  Join the Nuke Sports Bets community today!  Get access to a dozen expert handicappers, automated AI-powered betting tools, and an active community of sports enthusiasts. Sign up on Whop and connect your Discord account to join the server.")
+                            .font(.body)
+                            .foregroundStyle(.white.opacity(0.88))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text("Elevate your sports betting experience today.")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(NukeTheme.cyan)
+
+                        Link(destination: membershipURL) {
+                            Label("ENTER THE BUNKER", systemImage: "bolt.shield.fill")
+                                .font(.subheadline.weight(.heavy))
+                                .foregroundStyle(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background(NukeTheme.orange, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                                .shadow(color: NukeTheme.orange.opacity(0.28), radius: 12, y: 5)
+                        }
+                        .accessibilityHint("Opens the Nuke Sports Bets membership page in your browser")
+
+                        Text("Opens the membership page in your browser.")
+                            .font(.caption2)
+                            .foregroundStyle(NukeTheme.muted)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 28)
+        }
+        .background(NukeCommandBackdrop())
+        .navigationTitle("Nuke Community")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .accessibilityLabel("Close community invitation")
+            }
+        }
+    }
+
+    private var communityHero: some View {
+        ZStack(alignment: .bottomLeading) {
+            Image("CommandCenterHero")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .aspectRatio(1.75, contentMode: .fit)
+                .clipped()
+                .opacity(0.78)
+            LinearGradient(colors: [.clear, NukeTheme.abyss.opacity(0.98)], startPoint: .top, endPoint: .bottom)
+            VStack(alignment: .leading, spacing: 8) {
+                NukeStatusPill(title: "Nuke Sports Bets", color: NukeTheme.orange, symbol: "bolt.fill")
+                Text("JOIN NUKE SPORTS BETS")
+                    .font(.title2.weight(.black))
+                    .tracking(1.05)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("A community built for the board.")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.82))
+            }
+            .padding(18)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(NukeTheme.orange.opacity(0.45), lineWidth: 1))
+    }
+}
+
 struct FreePicksView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = NukeContentFeedViewModel(visibility: .free)
 
     var body: some View {
@@ -101,6 +185,14 @@ struct FreePicksView: View {
         .navigationTitle("Free Picks")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .accessibilityLabel("Close free picks")
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
                     TailBoardView()

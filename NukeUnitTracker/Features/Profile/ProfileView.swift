@@ -6,7 +6,6 @@ struct ProfileView: View {
     @EnvironmentObject private var premiumAccess: PremiumAccessManager
     @Query private var bets: [Bet]
     @Bindable var profile: UserProfile
-    @State private var isRequestingNotifications = false
     @State private var isConfirmingDiscordDisconnect = false
 
     init(profile: UserProfile) { self.profile = profile }
@@ -14,18 +13,9 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("PROFILE") {
-                    TextField("Callsign (optional)", text: $profile.displayName)
-                    Text("Only used for the greeting on this device. Leave it blank if you prefer.")
-                        .font(.footnote)
-                        .foregroundStyle(NukeTheme.muted)
+                Section("TRACKER") {
                     HStack { Text("Unit value"); Spacer(); TextField("Unit value", value: $profile.unitValue, format: .currency(code: "USD")).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
                     Picker("Odds format", selection: $profile.oddsFormatRaw) { ForEach(OddsFormat.allCases) { Text($0.label).tag($0.rawValue) } }
-                }
-                Section("NUKE FREE PICKS") {
-                    Toggle("Free-pick notifications", isOn: $profile.freePickAlertsEnabled)
-                        .onChange(of: profile.freePickAlertsEnabled) { _, enabled in if enabled { isRequestingNotifications = true } }
-                    if profile.freePickAlertsEnabled { Picker("Quiet start", selection: $profile.quietHoursStart) { ForEach(0..<24, id: \.self) { Text(hour($0)).tag($0) } }; Picker("Quiet end", selection: $profile.quietHoursEnd) { ForEach(0..<24, id: \.self) { Text(hour($0)).tag($0) } } }
                 }
                 if NukeFeatureFlags.vaultVerificationEnabled {
                     Section("NUKE VAULT") {
@@ -39,7 +29,7 @@ struct ProfileView: View {
                                     .foregroundStyle(profile.hasActiveVIPAccess ? NukeTheme.green : NukeTheme.muted)
                             }
                         }
-                        Text("Your tracker and free Nuke content stay available without a Discord account. Connect only to verify a VIP role.")
+                        Text("Your tracker stays available without a Discord account. Connect only to verify a VIP role.")
                             .font(.footnote)
                             .foregroundStyle(NukeTheme.muted)
                         if premiumAccess.hasSession {
@@ -60,10 +50,6 @@ struct ProfileView: View {
             }
             .scrollContentBackground(.hidden).background(NukeTheme.background).navigationTitle("You")
         }
-        .task(id: isRequestingNotifications) { if isRequestingNotifications { let granted = await NotificationService.requestFreePickAuthorization(); if granted { NotificationService.registerForRemoteNotifications() } else { profile.freePickAlertsEnabled = false }; isRequestingNotifications = false; try? modelContext.save() } }
-        .task(id: profile.freePickAlertsEnabled) { if profile.freePickAlertsEnabled { await DeviceRegistration.registerIfAvailable(quietStart: profile.quietHoursStart, quietEnd: profile.quietHoursEnd) } }
-        .onChange(of: profile.quietHoursStart) { _, _ in saveNotificationPreferences() }
-        .onChange(of: profile.quietHoursEnd) { _, _ in saveNotificationPreferences() }
         .confirmationDialog("Disconnect Discord?", isPresented: $isConfirmingDiscordDisconnect, titleVisibility: .visible) {
             Button("Disconnect", role: .destructive) {
                 Task { @MainActor in
@@ -73,11 +59,5 @@ struct ProfileView: View {
         } message: {
             Text("This removes the Nuke Vault session from this device. Your free tracker and private bet history will remain intact.")
         }
-    }
-    private func hour(_ value: Int) -> String { DateFormatter.localizedString(from: Calendar.current.date(bySettingHour: value, minute: 0, second: 0, of: .now)!, dateStyle: .none, timeStyle: .short) }
-    private func saveNotificationPreferences() {
-        try? modelContext.save()
-        guard profile.freePickAlertsEnabled else { return }
-        Task { await DeviceRegistration.registerIfAvailable(quietStart: profile.quietHoursStart, quietEnd: profile.quietHoursEnd) }
     }
 }
