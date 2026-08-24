@@ -78,17 +78,28 @@ private struct NukeTabBar: View {
             tabButton(.home)
             tabButton(.bets)
             Button(action: addAction) {
-                VStack(spacing: 1) {
-                    Image(systemName: "plus")
-                        .font(.title3.bold())
-                    Text("LOG")
-                        .font(.caption2.weight(.black))
-                        .tracking(0.7)
+                ZStack {
+                    Circle()
+                        .fill(NukeTheme.bgBase)
+
+                    Circle()
+                        .stroke(NukeTheme.neonOrange, lineWidth: 2)
+                        .neonGlow(color: NukeTheme.neonOrange)
+
+                    VStack(spacing: 1) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 22, weight: .bold))
+                            .shadow(color: NukeTheme.neonOrange.opacity(0.75), radius: 3)
+                        Text("LOG")
+                            .font(NukeTheme.headerFont(size: 10, relativeTo: .caption2))
+                            .tracking(0.9)
+                    }
+                    .foregroundStyle(NukeTheme.neonOrange)
                 }
-                    .foregroundStyle(.black)
-                    .frame(width: 64, height: 64)
-                    .background(Circle().fill(NukeTheme.orange).shadow(color: NukeTheme.orange.opacity(0.5), radius: 14))
+                .frame(width: 64, height: 64)
+                .contentShape(Circle())
             }
+            .buttonStyle(.plain)
             .accessibilityLabel("Log a bet")
             tabButton(.stats)
             tabButton(.profile)
@@ -96,17 +107,28 @@ private struct NukeTabBar: View {
         .padding(.horizontal, 10)
         .padding(.top, 8)
         .padding(.bottom, 8)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .top) { Divider().overlay(NukeTheme.border) }
+        .background {
+            ZStack {
+                Rectangle().fill(.ultraThinMaterial)
+                NukeTheme.bgBase.opacity(0.72)
+            }
+        }
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color.white.opacity(0.10))
+                .frame(height: 1)
+        }
     }
 
     private func tabButton(_ tab: AppTab) -> some View {
         Button { selection = tab } label: {
             VStack(spacing: 4) {
                 Image(systemName: tab.icon).font(.system(size: 17, weight: .semibold))
-                Text(tab.title).font(.caption2.weight(.semibold))
+                Text(tab.title.uppercased())
+                    .font(NukeTheme.headerFont(size: 10, relativeTo: .caption2))
+                    .tracking(0.5)
             }
-            .foregroundStyle(selection == tab ? NukeTheme.orange : NukeTheme.muted)
+            .foregroundStyle(selection == tab ? NukeTheme.neonOrange : Color.white.opacity(0.46))
             .frame(maxWidth: .infinity, minHeight: 46)
         }
         .accessibilityLabel(tab.title)
