@@ -1,6 +1,52 @@
 import SwiftUI
 
 enum NukeTheme {
+    // MARK: - Visual Lab palette
+
+    /// #0B0E14 - the deepest command-center background.
+    static let bgBase = Color(
+        red: 11.0 / 255.0,
+        green: 14.0 / 255.0,
+        blue: 20.0 / 255.0
+    )
+
+    /// #181D26 - raised panels and tactical surfaces.
+    static let bgSurface = Color(
+        red: 24.0 / 255.0,
+        green: 29.0 / 255.0,
+        blue: 38.0 / 255.0
+    )
+
+    /// #FF6B00 - primary actions and hot HUD accents.
+    static let neonOrange = Color(
+        red: 1.0,
+        green: 107.0 / 255.0,
+        blue: 0.0
+    )
+
+    /// #22C55E - positive performance and confirmed states.
+    static let matrixGreen = Color(
+        red: 34.0 / 255.0,
+        green: 197.0 / 255.0,
+        blue: 94.0 / 255.0
+    )
+
+    /// #EF4444 - losses, destructive actions, and alerts.
+    static let alertRed = Color(
+        red: 239.0 / 255.0,
+        green: 68.0 / 255.0,
+        blue: 68.0 / 255.0
+    )
+
+    /// #00E5FF - telemetry, charts, and active HUD signals.
+    static let hudCyan = Color(
+        red: 0.0,
+        green: 229.0 / 255.0,
+        blue: 1.0
+    )
+
+    // Existing tokens remain unchanged during the theme-foundation step.
+    // Screens will migrate to the Visual Lab palette deliberately in later passes.
     static let background = Color(red: 0.015, green: 0.02, blue: 0.03)
     static let abyss = Color(red: 0.008, green: 0.012, blue: 0.02)
     static let surface = Color(red: 0.055, green: 0.07, blue: 0.10)
@@ -19,6 +65,50 @@ enum NukeTheme {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
+}
+
+struct TacticalCardStyle: ViewModifier {
+    private let shape = RoundedRectangle(cornerRadius: 10, style: .continuous)
+
+    func body(content: Content) -> some View {
+        content
+            .background(NukeTheme.bgSurface, in: shape)
+            .overlay {
+                shape
+                    .stroke(Color.white.opacity(0.10), lineWidth: 1)
+            }
+            .overlay {
+                // A clipped, softened dark stroke creates an inset edge without
+                // changing the content's size or hit-testing behavior.
+                shape
+                    .stroke(Color.black.opacity(0.62), lineWidth: 4)
+                    .blur(radius: 3)
+                    .offset(y: 2)
+                    .clipShape(shape)
+                    .allowsHitTesting(false)
+            }
+            .clipShape(shape)
+    }
+}
+
+struct NeonGlow: ViewModifier {
+    let color: Color
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(color: color.opacity(0.88), radius: 3)
+            .shadow(color: color.opacity(0.42), radius: 14)
+    }
+}
+
+extension View {
+    func tacticalCard() -> some View {
+        modifier(TacticalCardStyle())
+    }
+
+    func neonGlow(color: Color) -> some View {
+        modifier(NeonGlow(color: color))
+    }
 }
 
 struct NukeCard<Content: View>: View {
