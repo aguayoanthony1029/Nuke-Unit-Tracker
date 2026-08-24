@@ -316,15 +316,54 @@ private struct UnitsChart: View {
         } else {
             Chart(points, id: \.0) { point in
                 AreaMark(x: .value("Date", point.0), y: .value("Units", point.1))
-                    .foregroundStyle(LinearGradient(colors: [NukeTheme.cyan.opacity(0.32), .clear], startPoint: .top, endPoint: .bottom))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [NukeTheme.hudCyan.opacity(0.24), NukeTheme.hudCyan.opacity(0.02)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .interpolationMethod(.catmullRom)
+
                 LineMark(x: .value("Date", point.0), y: .value("Units", point.1))
-                    .foregroundStyle(NukeTheme.cyan)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [NukeTheme.hudCyan.opacity(0.50), NukeTheme.hudCyan],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
                     .interpolationMethod(.catmullRom)
+                    .shadow(color: NukeTheme.hudCyan.opacity(0.82), radius: 4)
+                    .shadow(color: NukeTheme.hudCyan.opacity(0.36), radius: 10)
+
+                PointMark(x: .value("Date", point.0), y: .value("Units", point.1))
+                    .foregroundStyle(Color.white)
+                    .symbolSize(18)
+                    .shadow(color: NukeTheme.hudCyan.opacity(0.95), radius: 3)
+                    .shadow(color: NukeTheme.hudCyan.opacity(0.42), radius: 8)
             }
-            .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) }
-            .chartYAxis { AxisMarks(position: .leading) }
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
+                        .foregroundStyle(Color.white.opacity(0.05))
+                    AxisTick(stroke: StrokeStyle(lineWidth: 0.5))
+                        .foregroundStyle(Color.white.opacity(0.16))
+                    AxisValueLabel()
+                        .foregroundStyle(Color.white.opacity(0.48))
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { _ in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
+                        .foregroundStyle(Color.white.opacity(0.05))
+                    AxisTick(stroke: StrokeStyle(lineWidth: 0.5))
+                        .foregroundStyle(Color.white.opacity(0.16))
+                    AxisValueLabel()
+                        .foregroundStyle(Color.white.opacity(0.48))
+                }
+            }
         }
     }
 }
