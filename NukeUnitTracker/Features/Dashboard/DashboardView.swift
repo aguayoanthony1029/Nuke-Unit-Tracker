@@ -12,7 +12,11 @@ struct DashboardView: View {
 
     private var filtered: [Bet] { StatisticsService.filtered(bets, period: period) }
     private var summary: DashboardSummary { StatisticsService.summary(for: filtered) }
-    private var performanceColor: Color { summary.netUnits >= 0 ? NukeTheme.green : NukeTheme.red }
+    private var performanceColor: Color {
+        if summary.netUnits > 0 { return NukeTheme.matrixGreen }
+        if summary.netUnits < 0 { return NukeTheme.alertRed }
+        return NukeTheme.hudCyan
+    }
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -30,6 +34,7 @@ struct DashboardView: View {
             .padding(.top, 12)
             .padding(.bottom, 28)
         }
+        .background(NukeTheme.bgBase.ignoresSafeArea())
         .sheet(isPresented: $isShowingCommunity) {
             NavigationStack {
                 NukeCommunityView()
@@ -72,18 +77,18 @@ struct DashboardView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("NUKE")
-                    .font(.title3.weight(.black))
+                    .font(NukeTheme.titleFont(size: 24, relativeTo: .title3))
                     .tracking(1.5)
                 Text("COMMAND CENTER")
-                    .font(.caption2.weight(.heavy))
+                    .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                     .tracking(1.05)
-                    .foregroundStyle(NukeTheme.orange)
+                    .foregroundStyle(NukeTheme.neonOrange)
             }
         }
     }
 
     private var liveStatus: some View {
-        NukeStatusPill(title: "Live", color: NukeTheme.cyan, symbol: "bolt.fill")
+        NukeStatusPill(title: "Live", color: NukeTheme.hudCyan, symbol: "bolt.fill")
             .fixedSize(horizontal: true, vertical: false)
     }
 
@@ -94,29 +99,28 @@ struct DashboardView: View {
                     withAnimation(.snappy(duration: 0.22)) { period = option }
                 } label: {
                     Text(option.title.uppercased())
-                        .font(.caption.weight(.black))
+                        .font(NukeTheme.headerFont(size: 13, relativeTo: .caption))
                         .tracking(0.75)
-                        .foregroundStyle(period == option ? .black : NukeTheme.muted)
+                        .foregroundStyle(period == option ? .black : Color.white.opacity(0.50))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
-                        .background(period == option ? NukeTheme.orange : .clear, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                        .background(period == option ? NukeTheme.neonOrange : .clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Show \(option.title.lowercased()) results")
             }
         }
         .padding(5)
-        .background(NukeTheme.abyss.opacity(0.82), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(NukeTheme.border.opacity(0.9), lineWidth: 1))
+        .tacticalCard()
     }
 
     private var unitConsole: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
                 Label("NET UNITS", systemImage: "bolt.horizontal.circle.fill")
-                    .font(.caption.weight(.heavy))
+                    .font(NukeTheme.headerFont(size: 13, relativeTo: .caption))
                     .tracking(1.1)
-                    .foregroundStyle(NukeTheme.cyan)
+                    .foregroundStyle(Color.white.opacity(0.50))
                 Spacer(minLength: 8)
                 NukeStatusPill(
                     title: summary.netUnits >= 0 ? "Signal positive" : "Review tape",
@@ -126,8 +130,8 @@ struct DashboardView: View {
                 .fixedSize(horizontal: true, vertical: false)
             }
             ViewThatFits(in: .horizontal) {
-                unitValueText(font: .system(size: netUnitsFontSize, weight: .black, design: .rounded))
-                unitValueText(font: .largeTitle.weight(.black))
+                unitValueText(size: netUnitsFontSize)
+                unitValueText(size: 34)
             }
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
@@ -140,24 +144,22 @@ struct DashboardView: View {
                     Text("\(summary.record.label) RECORD")
                 }
             }
-            .font(.caption.weight(.bold))
+            .font(NukeTheme.headerFont(size: 13, relativeTo: .caption))
             .foregroundStyle(.white.opacity(0.78))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(18)
         .background { unitConsoleBackdrop }
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(NukeTheme.cyan.opacity(0.46), lineWidth: 1.2))
-        .shadow(color: NukeTheme.cyan.opacity(0.12), radius: 18, y: 7)
+        .tacticalCard()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Net units \(summary.netUnits.unitText), \(summary.record.label) record")
     }
 
     private var metricGrid: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 10)], spacing: 10) {
-            CommandMetric(label: "RECORD", value: summary.record.label, detail: "W-L-P", symbol: "checklist", color: NukeTheme.cyan)
-            CommandMetric(label: "WIN RATE", value: summary.winRate.formatted(.percent.precision(.fractionLength(1))), detail: "SETTLED BETS", symbol: "scope", color: NukeTheme.green)
-            CommandMetric(label: "STREAK", value: summary.streak, detail: "CURRENT RUN", symbol: "flame.fill", color: NukeTheme.ember)
+            CommandMetric(label: "RECORD", value: summary.record.label, detail: "W-L-P", symbol: "checklist", color: NukeTheme.hudCyan)
+            CommandMetric(label: "WIN RATE", value: summary.winRate.formatted(.percent.precision(.fractionLength(1))), detail: "SETTLED BETS", symbol: "scope", color: NukeTheme.matrixGreen)
+            CommandMetric(label: "STREAK", value: summary.streak, detail: "CURRENT RUN", symbol: "flame.fill", color: NukeTheme.neonOrange)
         }
     }
 
@@ -207,12 +209,12 @@ struct DashboardView: View {
         }
     }
 
-    private func unitValueText(font: Font) -> some View {
+    private func unitValueText(size: CGFloat) -> some View {
         Text(summary.netUnits.unitText)
-            .font(font)
+            .font(NukeTheme.dataFont(size: size, relativeTo: .largeTitle))
             .monospacedDigit()
             .foregroundStyle(performanceColor)
-            .shadow(color: performanceColor.opacity(0.38), radius: 12)
+            .neonGlow(color: performanceColor)
             .lineLimit(1)
     }
 }
@@ -232,25 +234,25 @@ private struct CommandMetric: View {
                 .frame(width: 29, height: 29)
                 .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
             Text(label)
-                .font(.caption2.weight(.heavy))
+                .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                 .tracking(0.7)
-                .foregroundStyle(NukeTheme.muted)
+                .foregroundStyle(Color.white.opacity(0.50))
                 .lineLimit(2)
             Text(value)
-                .font(.headline.weight(.black))
+                .font(NukeTheme.dataFont(size: 23, relativeTo: .headline))
                 .monospacedDigit()
-                .foregroundStyle(.white)
+                .foregroundStyle(color)
+                .neonGlow(color: color)
                 .lineLimit(1)
             Text(detail)
-                .font(.caption2.weight(.bold))
+                .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
                 .tracking(0.5)
                 .foregroundStyle(color.opacity(0.88))
                 .lineLimit(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(NukeTheme.surfaceRaised, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(NukeTheme.border.opacity(0.92), lineWidth: 1))
+        .tacticalCard()
     }
 }
 
@@ -258,34 +260,41 @@ private struct UnitsChart: View {
     let bets: [Bet]
     let netUnits: Double
 
+    private var netUnitsColor: Color {
+        if netUnits > 0 { return NukeTheme.matrixGreen }
+        if netUnits < 0 { return NukeTheme.alertRed }
+        return NukeTheme.hudCyan
+    }
+
     private var points: [(Date, Double)] {
         StatisticsService.cumulativePoints(for: bets.filter { $0.result != .pending })
     }
 
     var body: some View {
-        NukeCard {
-            VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("CUMULATIVE UNITS")
-                            .font(.caption.weight(.heavy))
+                            .font(NukeTheme.headerFont(size: 13, relativeTo: .caption))
                             .tracking(1)
-                            .foregroundStyle(NukeTheme.muted)
+                            .foregroundStyle(Color.white.opacity(0.50))
                         Text("YOUR EQUITY CURVE")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(NukeTheme.cyan)
+                            .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
+                            .foregroundStyle(NukeTheme.hudCyan)
                     }
                     Spacer()
                     Text(netUnits.unitText)
-                        .font(.headline.weight(.black))
+                        .font(NukeTheme.dataFont(size: 22, relativeTo: .headline))
                         .monospacedDigit()
-                        .foregroundStyle(netUnits >= 0 ? NukeTheme.green : NukeTheme.red)
+                        .foregroundStyle(netUnitsColor)
+                        .neonGlow(color: netUnitsColor)
                 }
                 chartPlot
                     .frame(maxWidth: .infinity)
                     .aspectRatio(1.8, contentMode: .fit)
             }
-        }
+        .padding(16)
+        .tacticalCard()
     }
 
     @ViewBuilder

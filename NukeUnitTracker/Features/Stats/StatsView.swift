@@ -26,74 +26,87 @@ struct StatsView: View {
                         eyebrow: "Performance map",
                         title: "Units by sport",
                         items: sportTotals,
-                        accent: NukeTheme.cyan
+                        accent: NukeTheme.hudCyan
                     )
                     NukePerformanceCard(
                         eyebrow: "Sportsbook audit",
                         title: "Units by book",
                         items: bookTotals,
-                        accent: NukeTheme.ember
+                        accent: NukeTheme.neonOrange
                     )
                     NukePerformanceCard(
                         eyebrow: "Ticket profile",
                         title: "Units by bet type",
                         items: typeTotals,
-                        accent: NukeTheme.orange
+                        accent: NukeTheme.neonOrange
                     )
                 }
                 .padding()
                 .padding(.bottom, 18)
             }
-            .background(NukeCommandBackdrop())
+            .background(NukeTheme.bgBase.ignoresSafeArea())
             .navigationTitle("Stats")
         }
     }
 
     private var commandSummary: some View {
-        NukeCard {
-            VStack(alignment: .leading, spacing: 13) {
+        VStack(alignment: .leading, spacing: 13) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("ALL-TIME COMMAND LOG")
-                            .font(.caption2.weight(.heavy))
+                            .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                             .tracking(1.1)
-                            .foregroundStyle(NukeTheme.muted)
+                            .foregroundStyle(Color.white.opacity(0.50))
                         Text(summary.record.label)
-                            .font(.system(size: 33, weight: .heavy, design: .rounded))
+                            .font(NukeTheme.dataFont(size: 33, relativeTo: .title))
+                            .foregroundStyle(NukeTheme.hudCyan)
+                            .neonGlow(color: NukeTheme.hudCyan)
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) {
                         Text("NET UNITS")
-                            .font(.caption2.weight(.heavy))
+                            .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                             .tracking(1.1)
-                            .foregroundStyle(NukeTheme.muted)
+                            .foregroundStyle(Color.white.opacity(0.50))
                         Text(summary.netUnits.unitText)
-                            .font(.title.bold())
-                            .foregroundStyle(summary.netUnits >= 0 ? NukeTheme.green : NukeTheme.red)
+                            .font(NukeTheme.dataFont(size: 30, relativeTo: .title))
+                            .foregroundStyle(performanceColor(for: summary.netUnits))
+                            .neonGlow(color: performanceColor(for: summary.netUnits))
                     }
                 }
                 Divider().overlay(NukeTheme.border)
                 HStack(spacing: 8) {
-                    statCell("ROI", summary.roi, format: .percent.precision(.fractionLength(1)), color: NukeTheme.cyan)
-                    statCell("AVG STAKE", summary.averageStake.plainUnitText, color: NukeTheme.orange)
-                    statCell("AVG ODDS", averageDecimalOdds == 0 ? "--" : String(format: "%.2f", averageDecimalOdds), color: NukeTheme.ember)
+                    statCell("ROI", summary.roi, format: .percent.precision(.fractionLength(1)), color: performanceColor(for: summary.roi))
+                    statCell("AVG STAKE", summary.averageStake.plainUnitText, color: NukeTheme.neonOrange)
+                    statCell("AVG ODDS", averageDecimalOdds == 0 ? "--" : String(format: "%.2f", averageDecimalOdds), color: NukeTheme.hudCyan)
                 }
             }
-        }
+        .padding(16)
+        .tacticalCard()
     }
 
     private func statCell<F: FormatStyle>(_ label: String, _ value: F.FormatInput, format: F, color: Color) -> some View where F.FormatOutput == String {
         VStack(alignment: .leading, spacing: 4) {
-            Text(label).font(.caption2.weight(.bold)).foregroundStyle(NukeTheme.muted)
-            Text(format.format(value)).font(.subheadline.weight(.black)).foregroundStyle(color)
+            Text(label)
+                .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
+                .foregroundStyle(Color.white.opacity(0.50))
+            Text(format.format(value))
+                .font(NukeTheme.dataFont(size: 18, relativeTo: .subheadline))
+                .foregroundStyle(color)
+                .neonGlow(color: color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func statCell(_ label: String, _ value: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(label).font(.caption2.weight(.bold)).foregroundStyle(NukeTheme.muted)
-            Text(value).font(.subheadline.weight(.black)).foregroundStyle(color)
+            Text(label)
+                .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
+                .foregroundStyle(Color.white.opacity(0.50))
+            Text(value)
+                .font(NukeTheme.dataFont(size: 18, relativeTo: .subheadline))
+                .foregroundStyle(color)
+                .neonGlow(color: color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -102,6 +115,12 @@ struct StatsView: View {
         Dictionary(grouping: settledBets, by: key)
             .map { PerformanceItem(label: $0.key, netUnits: $0.value.reduce(0) { $0 + $1.profitUnits }) }
             .sorted { abs($0.netUnits) > abs($1.netUnits) }
+    }
+
+    private func performanceColor(for value: Double) -> Color {
+        if value > 0 { return NukeTheme.matrixGreen }
+        if value < 0 { return NukeTheme.alertRed }
+        return NukeTheme.hudCyan
     }
 }
 
@@ -118,9 +137,17 @@ private struct NukePerformanceCard: View {
     let accent: Color
 
     var body: some View {
-        NukeCard {
-            VStack(alignment: .leading, spacing: 12) {
-                NukeSectionHeader(eyebrow: eyebrow, title: title)
+        VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(eyebrow.uppercased())
+                        .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
+                        .tracking(1.1)
+                        .foregroundStyle(Color.white.opacity(0.50))
+                    Text(title.uppercased())
+                        .font(NukeTheme.headerFont(size: 15, relativeTo: .subheadline))
+                        .tracking(0.8)
+                        .foregroundStyle(Color.white.opacity(0.72))
+                }
                 if items.isEmpty {
                     ContentUnavailableView(
                         "No settled bets yet",
@@ -134,11 +161,12 @@ private struct NukePerformanceCard: View {
                             x: .value("Units", item.netUnits),
                             y: .value("Category", item.label)
                         )
-                        .foregroundStyle(item.netUnits >= 0 ? NukeTheme.green : NukeTheme.red)
+                        .foregroundStyle(performanceColor(for: item.netUnits))
                         .annotation(position: item.netUnits >= 0 ? .trailing : .leading) {
                             Text(item.netUnits.unitText)
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(item.netUnits >= 0 ? NukeTheme.green : NukeTheme.red)
+                                .font(NukeTheme.dataFont(size: 12, relativeTo: .caption2))
+                                .foregroundStyle(performanceColor(for: item.netUnits))
+                                .neonGlow(color: performanceColor(for: item.netUnits))
                         }
                     }
                     .chartXAxis { AxisMarks(position: .bottom) }
@@ -146,7 +174,21 @@ private struct NukePerformanceCard: View {
                     .frame(height: max(118, CGFloat(items.count) * 42))
                 }
             }
+        .padding(16)
+        .tacticalCard()
+        .overlay(alignment: .top) {
+            Capsule()
+                .fill(accent)
+                .frame(height: 1)
+                .padding(.horizontal, 14)
+                .neonGlow(color: accent)
         }
+    }
+
+    private func performanceColor(for value: Double) -> Color {
+        if value > 0 { return NukeTheme.matrixGreen }
+        if value < 0 { return NukeTheme.alertRed }
+        return NukeTheme.hudCyan
     }
 }
 
@@ -156,14 +198,13 @@ private struct CalendarUnitsView: View {
     private let calendar = Calendar.current
 
     var body: some View {
-        NukeCard {
-            VStack(spacing: 11) {
+        VStack(spacing: 11) {
                 HStack {
                     Button { shiftMonth(-1) } label: {
                         Image(systemName: "chevron.left")
                             .font(.subheadline.weight(.bold))
                             .frame(width: 34, height: 34)
-                            .background(NukeTheme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(NukeTheme.bgBase, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Previous month")
@@ -171,11 +212,11 @@ private struct CalendarUnitsView: View {
                     Spacer()
                     VStack(spacing: 2) {
                         Text("DAILY UNIT CALENDAR")
-                            .font(.caption2.weight(.heavy))
+                            .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                             .tracking(1.1)
-                            .foregroundStyle(NukeTheme.muted)
+                            .foregroundStyle(Color.white.opacity(0.50))
                         Text(month.formatted(.dateTime.month(.wide).year()))
-                            .font(.headline.weight(.black))
+                            .font(NukeTheme.titleFont(size: 20, relativeTo: .headline))
                     }
                     Spacer()
 
@@ -183,7 +224,7 @@ private struct CalendarUnitsView: View {
                         Image(systemName: "chevron.right")
                             .font(.subheadline.weight(.bold))
                             .frame(width: 34, height: 34)
-                            .background(NukeTheme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .background(NukeTheme.bgBase, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Next month")
@@ -192,8 +233,8 @@ private struct CalendarUnitsView: View {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 5), count: 7), spacing: 5) {
                     ForEach(calendar.shortWeekdaySymbols, id: \.self) {
                         Text(String($0.prefix(1)))
-                            .font(.caption2.bold())
-                            .foregroundStyle(NukeTheme.muted)
+                            .font(NukeTheme.headerFont(size: 11, relativeTo: .caption2))
+                            .foregroundStyle(Color.white.opacity(0.50))
                             .frame(maxWidth: .infinity)
                     }
                     ForEach(days, id: \.self) { day in
@@ -206,16 +247,18 @@ private struct CalendarUnitsView: View {
                 }
                 HStack {
                     Text("MONTH TOTAL")
-                        .font(.caption2.weight(.heavy))
-                        .foregroundStyle(NukeTheme.muted)
+                        .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
+                        .foregroundStyle(Color.white.opacity(0.50))
                     Spacer()
                     Text(monthTotal.unitText)
-                        .font(.headline.weight(.black))
-                        .foregroundStyle(monthTotal >= 0 ? NukeTheme.green : NukeTheme.red)
+                        .font(NukeTheme.dataFont(size: 22, relativeTo: .headline))
+                        .foregroundStyle(monthTotalColor)
+                        .neonGlow(color: monthTotalColor)
                 }
                 .padding(.top, 4)
             }
-        }
+        .padding(16)
+        .tacticalCard()
     }
 
     private var days: [Date?] {
@@ -230,6 +273,12 @@ private struct CalendarUnitsView: View {
     private var monthTotal: Double {
         bets.filter { calendar.isDate($0.placedAt, equalTo: month, toGranularity: .month) }
             .reduce(0) { $0 + $1.profitUnits }
+    }
+
+    private var monthTotalColor: Color {
+        if monthTotal > 0 { return NukeTheme.matrixGreen }
+        if monthTotal < 0 { return NukeTheme.alertRed }
+        return NukeTheme.hudCyan
     }
 
     private func total(for day: Date) -> Double {
@@ -248,20 +297,23 @@ private struct DayCell: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(day.formatted(.dateTime.day())).font(.caption.bold())
+            Text(day.formatted(.dateTime.day()))
+                .font(NukeTheme.dataFont(size: 13, relativeTo: .caption))
             if total != 0 {
                 Text(total.unitText)
-                    .font(.system(size: 9, weight: .bold))
+                    .font(NukeTheme.dataFont(size: 10, relativeTo: .caption2))
+                    .neonGlow(color: total > 0 ? NukeTheme.matrixGreen : NukeTheme.alertRed)
                     .lineLimit(1)
             }
         }
-        .foregroundStyle(total > 0 ? NukeTheme.green : total < 0 ? NukeTheme.red : .white.opacity(0.7))
+        .foregroundStyle(total > 0 ? NukeTheme.matrixGreen : total < 0 ? NukeTheme.alertRed : .white.opacity(0.7))
         .frame(maxWidth: .infinity, minHeight: 50)
         .background(
-            (total > 0 ? NukeTheme.green : total < 0 ? NukeTheme.red : NukeTheme.surface)
+            (total > 0 ? NukeTheme.matrixGreen : total < 0 ? NukeTheme.alertRed : NukeTheme.bgSurface)
                 .opacity(total == 0 ? 0.32 : 0.15),
-            in: RoundedRectangle(cornerRadius: 7)
+            in: RoundedRectangle(cornerRadius: 10)
         )
+        .tacticalCard()
         .accessibilityLabel("\(day.formatted(date: .abbreviated, time: .omitted)), \(total.unitText)")
     }
 }
