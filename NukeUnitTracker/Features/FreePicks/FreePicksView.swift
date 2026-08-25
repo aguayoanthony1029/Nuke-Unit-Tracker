@@ -68,7 +68,7 @@ struct NukeCommunityView: View {
                             .foregroundStyle(NukeTheme.cyan)
 
                         Link(destination: membershipURL) {
-                            Label("ENTER THE BUNKER", systemImage: "bolt.shield.fill")
+                            Label("CLICK HERE", systemImage: "bolt.shield.fill")
                                 .font(.subheadline.weight(.heavy))
                                 .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity)
@@ -120,7 +120,7 @@ struct NukeCommunityView: View {
                     .font(.title2.weight(.black))
                     .tracking(1.05)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("A community built for the board.")
+                Text("Access expert picks & analysis")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.82))
             }
