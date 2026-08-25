@@ -3,6 +3,35 @@ import SwiftData
 import PhotosUI
 
 struct AddBetView: View {
+    private static let sportsbookCatalog = [
+        "1xBet",
+        "Bally Bet",
+        "bet365",
+        "BetMGM",
+        "BetOnline",
+        "betParx",
+        "Betr",
+        "BetRivers",
+        "Borgata Sportsbook",
+        "Bovada",
+        "Caesars Sportsbook",
+        "Circa Sports",
+        "Desert Diamond Sports",
+        "DraftKings",
+        "ESPN Bet",
+        "Fanatics Sportsbook",
+        "FanDuel",
+        "Fliff",
+        "Hard Rock Bet",
+        "Pinnacle",
+        "PrizePicks",
+        "Stake",
+        "SuperBook Sports",
+        "theScore Bet",
+        "TwinSpires",
+        "Underdog Fantasy"
+    ]
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var profiles: [UserProfile]
@@ -37,7 +66,13 @@ struct AddBetView: View {
                     Picker("Type", selection: $kind) { ForEach(BetKind.allCases) { Text($0.label).tag($0) } }
                     Picker("Sport", selection: $sport) { ForEach(["NBA", "NFL", "MLB", "NHL", "NCAAB", "Soccer", "Other"], id: \.self) { Text($0) } }
                     TextField("League (optional)", text: $league)
-                    TextField("Sportsbook (optional)", text: $sportsbook)
+                    Picker("Sportsbook", selection: $sportsbook) {
+                        Text("None").tag("")
+                        ForEach(sportsbookOptions, id: \.self) { book in
+                            Text(book).tag(book)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
                 Section("ODDS & STAKE") {
                     Picker("Format", selection: $oddsFormat) { ForEach(OddsFormat.allCases) { Text($0.label).tag($0) } }.pickerStyle(.segmented)
@@ -60,6 +95,12 @@ struct AddBetView: View {
     }
 
     private var existingAttachmentCount: Int { existingAttachments.count }
+    private var sportsbookOptions: [String] {
+        guard !sportsbook.isEmpty, !Self.sportsbookCatalog.contains(sportsbook) else {
+            return Self.sportsbookCatalog
+        }
+        return [sportsbook] + Self.sportsbookCatalog
+    }
     private var decimalOdds: Double { OddsConverter.decimal(from: Double(oddsText) ?? -110, format: oddsFormat) }
     private var calculationPreview: some View { HStack { labelValue("RISK", risk.plainUnitText); labelValue("TO WIN", (risk * (decimalOdds - 1)).plainUnitText); labelValue("RETURN", (risk * decimalOdds).plainUnitText) }.padding(.vertical, 5) }
     private func labelValue(_ label: String, _ value: String) -> some View { VStack(alignment: .leading) { Text(label).font(.caption2).foregroundStyle(NukeTheme.cyan); Text(value).font(.headline) }.frame(maxWidth: .infinity, alignment: .leading) }

@@ -49,7 +49,7 @@ struct DashboardView: View {
                 brandIdentity
                 HStack {
                     Spacer()
-                    liveStatus
+                    communityButton
                 }
             }
         }
@@ -61,7 +61,7 @@ struct DashboardView: View {
 
             Spacer(minLength: 8)
 
-            liveStatus
+            communityButton
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -87,9 +87,15 @@ struct DashboardView: View {
         }
     }
 
-    private var liveStatus: some View {
-        NukeStatusPill(title: "Live", color: NukeTheme.hudCyan, symbol: "bolt.fill")
-            .fixedSize(horizontal: true, vertical: false)
+    private var communityButton: some View {
+        Button {
+            isShowingCommunity = true
+        } label: {
+            NukeStatusPill(title: "Join the Community", color: NukeTheme.neonOrange, symbol: "person.3.fill")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Join the Nuke Sports Bets Community")
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var periodRail: some View {
@@ -123,7 +129,7 @@ struct DashboardView: View {
                     .foregroundStyle(Color.white.opacity(0.50))
                 Spacer(minLength: 8)
                 NukeStatusPill(
-                    title: summary.netUnits >= 0 ? "Signal positive" : "Review tape",
+                    title: summary.netUnits >= 0 ? "Positive" : "Negative",
                     color: performanceColor,
                     symbol: summary.netUnits >= 0 ? "arrow.up.right" : "arrow.down.right"
                 )

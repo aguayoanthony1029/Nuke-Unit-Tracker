@@ -7,7 +7,10 @@ struct NukeCommunityInvite: View {
         Button(action: openCommunity) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    NukeStatusPill(title: "Community access", color: NukeTheme.cyan, symbol: "person.3.fill")
+                    Text("NUKE COMMUNITY")
+                        .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
+                        .tracking(1)
+                        .foregroundStyle(Color.white.opacity(0.55))
                     Spacer()
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.title3)
@@ -68,7 +71,7 @@ struct NukeCommunityView: View {
                             .foregroundStyle(NukeTheme.cyan)
 
                         Link(destination: membershipURL) {
-                            Label("CLICK HERE", systemImage: "bolt.shield.fill")
+                            Text("CLICK HERE")
                                 .font(.subheadline.weight(.heavy))
                                 .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity)
