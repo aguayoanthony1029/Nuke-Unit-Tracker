@@ -72,13 +72,13 @@ struct NukeCommunityView: View {
                         .tracking(0.9)
                         .foregroundStyle(NukeTheme.hudCyan)
 
-                    Text("Learn how to size units, protect your bankroll, and approach sports betting with a consistent plan in this video guide from the Nuke community.")
+                    Text("At Nuke Sports Bets we believe in proper bankroll management. Watch this video to get an explanation of how to set your betting unit size and effectively manage your bankroll. Click here to watch the video")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.82))
                         .fixedSize(horizontal: false, vertical: true)
 
                     Link(destination: bankrollManagementURL) {
-                        Text("WATCH THE LESSON")
+                        Text("CLICK HERE TO WATCH THE VIDEO")
                             .font(NukeTheme.headerFont(size: 14, relativeTo: .subheadline))
                             .tracking(0.8)
                             .foregroundStyle(NukeTheme.hudCyan)
