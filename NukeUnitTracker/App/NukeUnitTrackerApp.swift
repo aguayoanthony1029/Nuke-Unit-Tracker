@@ -1,10 +1,13 @@
+import Foundation
 import SwiftUI
 import SwiftData
 import UIKit
 
 @main
 struct NukeUnitTrackerApp: App {
-    let modelContainer: ModelContainer = PersistenceController.makeContainer()
+    let modelContainer: ModelContainer = PersistenceController.makeContainer(
+        inMemory: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    )
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var premiumAccess = PremiumAccessManager()
 

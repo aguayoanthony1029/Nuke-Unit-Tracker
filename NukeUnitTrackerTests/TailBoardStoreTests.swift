@@ -5,7 +5,8 @@ import SwiftData
 @MainActor
 final class TailBoardStoreTests: XCTestCase {
     func testPublishedSelectionIsIdempotentWithinTheSamePost() throws {
-        let context = PersistenceController.makeContainer(inMemory: true).mainContext
+        let container = try makeContainer()
+        let context = container.mainContext
         let pick = makePick()
 
         let first = TailBoardStore.save(pick, sourcePostID: "daily-board", in: context)
@@ -18,7 +19,8 @@ final class TailBoardStoreTests: XCTestCase {
     }
 
     func testSameSelectionFromSeparatePostsDoesNotOverwrite() throws {
-        let context = PersistenceController.makeContainer(inMemory: true).mainContext
+        let container = try makeContainer()
+        let context = container.mainContext
         let pick = makePick()
 
         TailBoardStore.save(pick, sourcePostID: "morning-board", in: context)
@@ -30,7 +32,8 @@ final class TailBoardStoreTests: XCTestCase {
     }
 
     func testClearingTheBoardPreservesSavedSelections() throws {
-        let context = PersistenceController.makeContainer(inMemory: true).mainContext
+        let container = try makeContainer()
+        let context = container.mainContext
         let item = TailBoardStore.save(makePick(), sourcePostID: "daily-board", in: context)
 
         TailBoardStore.clearBasket([item], in: context)
@@ -38,6 +41,17 @@ final class TailBoardStoreTests: XCTestCase {
         let stored = try context.fetch(FetchDescriptor<TailBoardItem>())
         XCTAssertEqual(stored.count, 1)
         XCTAssertFalse(stored[0].isInBasket)
+    }
+
+    private func makeContainer() throws -> ModelContainer {
+        let schema = Schema([TailBoardItem.self])
+        let configuration = ModelConfiguration(
+            "TailBoardTests-\(UUID().uuidString)",
+            schema: schema,
+            isStoredInMemoryOnly: true,
+            cloudKitDatabase: .none
+        )
+        return try ModelContainer(for: schema, configurations: configuration)
     }
 
     private func makePick() -> NukePick {
