@@ -52,10 +52,11 @@ struct DashboardView: View {
 
             HStack(spacing: 10) {
                 brandMark
-                Text("NUKE")
-                    .font(NukeTheme.titleFont(size: 21, relativeTo: .title3))
-                    .tracking(1.2)
+                Text("NUKE SPORTS BETS")
+                    .font(NukeTheme.headerFont(size: 16, relativeTo: .headline))
+                    .tracking(0.8)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.72)
                 Spacer(minLength: 6)
                 communityButton
             }
@@ -71,7 +72,7 @@ struct DashboardView: View {
                 Text("NUKE")
                     .font(NukeTheme.titleFont(size: 24, relativeTo: .title3))
                     .tracking(1.5)
-                Text("COMMAND CENTER")
+                Text("SPORTS BETS")
                     .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                     .tracking(1.05)
                     .foregroundStyle(NukeTheme.neonOrange)
