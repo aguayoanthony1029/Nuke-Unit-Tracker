@@ -26,7 +26,6 @@ struct DashboardView: View {
                 unitConsole
                 metricGrid
                 UnitsChart(bets: filtered, netUnits: summary.netUnits)
-                NukeCommunityInvite { isShowingCommunity = true }
                 recentBets
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -44,36 +43,29 @@ struct DashboardView: View {
 
     private var commandHeader: some View {
         ViewThatFits(in: .horizontal) {
-            commandHeaderRow
-            VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 11) {
                 brandIdentity
-                HStack {
-                    Spacer()
-                    communityButton
-                }
+                    .layoutPriority(1)
+                Spacer(minLength: 8)
+                communityButton
             }
-        }
-    }
 
-    private var commandHeaderRow: some View {
-        HStack(spacing: 11) {
-            brandIdentity
-
-            Spacer(minLength: 8)
-
-            communityButton
+            HStack(spacing: 10) {
+                brandMark
+                Text("NUKE")
+                    .font(NukeTheme.titleFont(size: 21, relativeTo: .title3))
+                    .tracking(1.2)
+                    .lineLimit(1)
+                Spacer(minLength: 6)
+                communityButton
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var brandIdentity: some View {
         HStack(spacing: 11) {
-            Image("BrandMark")
-                .resizable()
-                .scaledToFit()
-                .frame(width: brandMarkSize, height: brandMarkSize)
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(NukeTheme.orange.opacity(0.6), lineWidth: 1))
+            brandMark
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("NUKE")
@@ -87,6 +79,15 @@ struct DashboardView: View {
         }
     }
 
+    private var brandMark: some View {
+        Image("BrandMark")
+            .resizable()
+            .scaledToFit()
+            .frame(width: brandMarkSize, height: brandMarkSize)
+            .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(NukeTheme.orange.opacity(0.6), lineWidth: 1))
+    }
+
     private var communityButton: some View {
         Button {
             isShowingCommunity = true
@@ -95,7 +96,7 @@ struct DashboardView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Join the Nuke Sports Bets Community")
-        .fixedSize(horizontal: true, vertical: false)
+        .fixedSize(horizontal: true, vertical: true)
     }
 
     private var periodRail: some View {
@@ -372,4 +373,5 @@ private struct UnitsChart: View {
             }
         }
     }
+
 }

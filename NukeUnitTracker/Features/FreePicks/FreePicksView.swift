@@ -1,58 +1,10 @@
 import SwiftUI
 
-struct NukeCommunityInvite: View {
-    let openCommunity: () -> Void
-
-    var body: some View {
-        Button(action: openCommunity) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("NUKE COMMUNITY")
-                        .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
-                        .tracking(1)
-                        .foregroundStyle(Color.white.opacity(0.55))
-                    Spacer()
-                    Image(systemName: "arrow.right.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(NukeTheme.orange)
-                }
-                Text("JOIN THE NUKE SPORTS BETS COMMUNITY FOR EXPERT PICKS!")
-                    .font(.headline.weight(.black))
-                    .tracking(0.5)
-                Text("Expert picks, AI-powered tools, and a community built for the board.")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.8))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .background { previewBackdrop }
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18).stroke(NukeTheme.cyan.opacity(0.3)))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Join the Nuke Sports Bets Community")
-    }
-
-    private var previewBackdrop: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Image("CommandCenterHero")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
-                    .opacity(0.68)
-                LinearGradient(colors: [.clear, NukeTheme.abyss.opacity(0.96)], startPoint: .top, endPoint: .bottom)
-            }
-        }
-    }
-}
-
 struct NukeCommunityView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let membershipURL = URL(string: "https://whop.com/checkout/plan_0Rv2LNrHJZPKw?a=spooky47crypto")!
+    private let bankrollManagementURL = URL(string: "https://www.youtube.com/watch?v=y13Tknx33v0&pp=ygUac3BvcnRzIGJldHRpbmcgd2l0aCBzcG9va3k%3D")!
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -86,6 +38,8 @@ struct NukeCommunityView: View {
                             .foregroundStyle(NukeTheme.muted)
                     }
                 }
+
+                educationSection
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
@@ -103,6 +57,45 @@ struct NukeCommunityView: View {
                     Image(systemName: "xmark")
                 }
                 .accessibilityLabel("Close community invitation")
+            }
+        }
+    }
+
+    private var educationSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            NukeSectionHeader(eyebrow: "Nuke Academy", title: "Learn the fundamentals")
+
+            NukeCard {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("BANKROLL MANAGEMENT")
+                        .font(NukeTheme.headerFont(size: 17, relativeTo: .headline))
+                        .tracking(0.9)
+                        .foregroundStyle(NukeTheme.hudCyan)
+
+                    Text("Learn how to size units, protect your bankroll, and approach sports betting with a consistent plan in this video guide from the Nuke community.")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.82))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Link(destination: bankrollManagementURL) {
+                        Text("WATCH THE LESSON")
+                            .font(NukeTheme.headerFont(size: 14, relativeTo: .subheadline))
+                            .tracking(0.8)
+                            .foregroundStyle(NukeTheme.hudCyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(NukeTheme.hudCyan.opacity(0.11), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(NukeTheme.hudCyan.opacity(0.48), lineWidth: 1)
+                            )
+                    }
+                    .accessibilityHint("Opens the bankroll management video on YouTube")
+
+                    Text("Educational content only. Always make decisions within your own limits.")
+                        .font(.caption2)
+                        .foregroundStyle(NukeTheme.muted)
+                }
             }
         }
     }
