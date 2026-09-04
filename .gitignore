@@ -4,9 +4,4 @@ build/
 *.xcuserstate
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
-NukeUnitTracker/Config/Secrets.xcconfig
-community-service/.env
-community-service/node_modules/
-community-service/dist/
-coverage/
-
+NukeUnitTracker.xcodeproj/

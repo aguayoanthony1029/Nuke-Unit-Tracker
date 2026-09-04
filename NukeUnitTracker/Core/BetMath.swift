@@ -1,6 +1,16 @@
 import Foundation
 
 enum OddsConverter {
+    static func isValid(_ input: Double, format: OddsFormat) -> Bool {
+        guard input.isFinite else { return false }
+        switch format {
+        case .decimal:
+            return input > 1
+        case .american:
+            return input <= -100 || input >= 100
+        }
+    }
+
     static func decimal(from input: Double, format: OddsFormat) -> Double {
         switch format {
         case .decimal: max(input, 1.01)
@@ -23,7 +33,6 @@ enum BetMath {
         }
     }
 
-    static func impliedProbability(decimalOdds: Double) -> Double { 1 / max(decimalOdds, 1.01) }
 }
 
 struct Record: Equatable {
@@ -74,10 +83,12 @@ enum StatisticsService {
     }
 
     private static func streak(for bets: [Bet]) -> String {
-        guard let last = bets.sorted(by: { $0.placedAt > $1.placedAt }).first, last.result == .win || last.result == .loss else { return "—" }
+        let decisions = bets
+            .filter { $0.result == .win || $0.result == .loss }
+            .sorted { $0.placedAt > $1.placedAt }
+        guard let last = decisions.first else { return "—" }
         let target = last.result
-        let count = bets.sorted { $0.placedAt > $1.placedAt }.prefix { $0.result == target }.count
+        let count = decisions.prefix { $0.result == target }.count
         return "\(target == .win ? "W" : "L")\(count)"
     }
 }
-

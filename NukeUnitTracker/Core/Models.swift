@@ -19,22 +19,15 @@ enum BetResult: String, CaseIterable, Codable, Identifiable {
     case pending, win, loss, push, void
     var id: String { rawValue }
     var label: String { rawValue.capitalized }
-    var tint: String { rawValue }
 }
 
 @Model
 final class UserProfile {
     var id: UUID = UUID()
-    var displayName: String = ""
     var unitValue: Double = 10
     var oddsFormatRaw: String = OddsFormat.american.rawValue
-    var freePickAlertsEnabled: Bool = false
-    var quietHoursStart: Int = 22
-    var quietHoursEnd: Int = 8
-    var createdAt: Date = .now
 
-    init(displayName: String, unitValue: Double) {
-        self.displayName = displayName
+    init(unitValue: Double) {
         self.unitValue = unitValue
     }
 
@@ -54,11 +47,9 @@ final class Bet {
     var oddsFormatRaw: String = OddsFormat.american.rawValue
     var riskUnits: Double = 1
     var resultRaw: String = BetResult.pending.rawValue
-    var placedAt: Date = .now
+    var placedAt: Date = Date.now
     var settledAt: Date?
     var notes: String = ""
-    var eventIdentifier: String?
-    var updatedAt: Date = .now
 
     init(title: String, sport: String, league: String, sportsbook: String, kind: BetKind, oddsInput: Double, oddsFormat: OddsFormat, riskUnits: Double, result: BetResult, placedAt: Date, notes: String) {
         self.title = title
@@ -98,19 +89,7 @@ final class SlipAttachment {
     var id: UUID = UUID()
     var betID: UUID = UUID()
     var localRelativePath: String = ""
-    var cloudRecordName: String?
-    var createdAt: Date = .now
     init(betID: UUID, localRelativePath: String) {
         self.betID = betID; self.localRelativePath = localRelativePath
     }
 }
-
-struct FreePick: Codable, Identifiable, Equatable {
-    let id: String
-    let content: String
-    let imageURLs: [URL]
-    let postedAt: Date
-    let editedAt: Date?
-    let discordURL: URL?
-}
-

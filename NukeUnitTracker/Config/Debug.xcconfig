@@ -1,5 +1,2 @@
-#include? "Secrets.xcconfig"
-PRODUCT_BUNDLE_IDENTIFIER = com.nukesportsbets.nukeunittracker.dev
+PRODUCT_BUNDLE_IDENTIFIER = com.nukesportsbets.nukeunittracker
 APP_DISPLAY_NAME = Nuke Unit Tracker Dev
-COMMUNITY_API_URL = https://api.example.com
-ODDS_API_KEY =

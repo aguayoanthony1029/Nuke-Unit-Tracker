@@ -9,9 +9,8 @@ configs:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    PRODUCT_BUNDLE_IDENTIFIER: com.nukesportsbets.nukeunittracker
-    CURRENT_PROJECT_VERSION: 1
-    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 3
+    MARKETING_VERSION: 1.0
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
 targets:
@@ -27,13 +26,11 @@ targets:
       Release: NukeUnitTracker/Config/Release.xcconfig
     settings:
       base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nukesportsbets.nukeunittracker
         INFOPLIST_FILE: NukeUnitTracker/Resources/Info.plist
         CODE_SIGN_ENTITLEMENTS: NukeUnitTracker/Resources/NukeUnitTracker.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         TARGETED_DEVICE_FAMILY: "1"
-    entitlements:
-      path: NukeUnitTracker/Resources/NukeUnitTracker.entitlements
   NukeUnitTrackerTests:
     type: bundle.unit-test
     platform: iOS
@@ -41,6 +38,10 @@ targets:
       - NukeUnitTrackerTests
     dependencies:
       - target: NukeUnitTracker
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nukesportsbets.nukeunittracker.tests
+        GENERATE_INFOPLIST_FILE: YES
   NukeUnitTrackerUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -48,4 +49,7 @@ targets:
       - NukeUnitTrackerUITests
     dependencies:
       - target: NukeUnitTracker
-
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nukesportsbets.nukeunittracker.uitests
+        GENERATE_INFOPLIST_FILE: YES
