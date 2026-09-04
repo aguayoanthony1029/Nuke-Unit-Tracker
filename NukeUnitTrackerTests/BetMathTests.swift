@@ -3,6 +3,16 @@ import XCTest
 
 final class BetMathTests: XCTestCase {
     func testAmericanOddsConvertToDecimal() { XCTAssertEqual(OddsConverter.decimal(from: -110, format: .american), 1.90909, accuracy: 0.0001); XCTAssertEqual(OddsConverter.decimal(from: 150, format: .american), 2.5, accuracy: 0.0001) }
+    func testOddsValidationRejectsInvalidSportsbookValues() {
+        XCTAssertTrue(OddsConverter.isValid(-110, format: .american))
+        XCTAssertTrue(OddsConverter.isValid(150, format: .american))
+        XCTAssertFalse(OddsConverter.isValid(0, format: .american))
+        XCTAssertFalse(OddsConverter.isValid(99, format: .american))
+        XCTAssertFalse(OddsConverter.isValid(-99, format: .american))
+        XCTAssertTrue(OddsConverter.isValid(1.91, format: .decimal))
+        XCTAssertFalse(OddsConverter.isValid(1, format: .decimal))
+        XCTAssertFalse(OddsConverter.isValid(.infinity, format: .decimal))
+    }
     func testWinningAndLosingUnits() {
         let win = Bet(title: "Test", sport: "NBA", league: "", sportsbook: "", kind: .straight, oddsInput: -110, oddsFormat: .american, riskUnits: 1, result: .win, placedAt: .now, notes: "")
         let loss = Bet(title: "Test", sport: "NBA", league: "", sportsbook: "", kind: .straight, oddsInput: -110, oddsFormat: .american, riskUnits: 2, result: .loss, placedAt: .now, notes: "")
@@ -20,5 +30,13 @@ final class BetMathTests: XCTestCase {
         XCTAssertEqual(summary.pendingExposure, 1.5, accuracy: 0.0001)
         XCTAssertEqual(summary.netUnits, -1.090909, accuracy: 0.0001)
         XCTAssertEqual(summary.roi, -1.090909 / 3, accuracy: 0.0001)
+    }
+
+    func testPushDoesNotBreakDecisionStreak() {
+        let win1 = Bet(title: "Win 1", sport: "NBA", league: "", sportsbook: "", kind: .straight, oddsInput: -110, oddsFormat: .american, riskUnits: 1, result: .win, placedAt: .now.addingTimeInterval(-120), notes: "")
+        let win2 = Bet(title: "Win 2", sport: "NBA", league: "", sportsbook: "", kind: .straight, oddsInput: -110, oddsFormat: .american, riskUnits: 1, result: .win, placedAt: .now.addingTimeInterval(-60), notes: "")
+        let push = Bet(title: "Push", sport: "NBA", league: "", sportsbook: "", kind: .straight, oddsInput: -110, oddsFormat: .american, riskUnits: 1, result: .push, placedAt: .now, notes: "")
+
+        XCTAssertEqual(StatisticsService.summary(for: [win1, win2, push]).streak, "W2")
     }
 }

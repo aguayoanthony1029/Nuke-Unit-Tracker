@@ -52,7 +52,7 @@ struct DashboardView: View {
 
             HStack(spacing: 10) {
                 brandMark
-                Text("NUKE SPORTS BETS")
+                Text("NUKE UNIT TRACKER")
                     .font(NukeTheme.headerFont(size: 16, relativeTo: .headline))
                     .tracking(0.8)
                     .lineLimit(1)
@@ -72,7 +72,7 @@ struct DashboardView: View {
                 Text("NUKE")
                     .font(NukeTheme.titleFont(size: 24, relativeTo: .title3))
                     .tracking(1.5)
-                Text("SPORTS BETS")
+                Text("UNIT TRACKER")
                     .font(NukeTheme.headerFont(size: 12, relativeTo: .caption2))
                     .tracking(1.05)
                     .foregroundStyle(NukeTheme.neonOrange)
@@ -131,9 +131,9 @@ struct DashboardView: View {
                     .foregroundStyle(Color.white.opacity(0.50))
                 Spacer(minLength: 8)
                 NukeStatusPill(
-                    title: summary.netUnits >= 0 ? "Positive" : "Negative",
+                    title: performanceLabel,
                     color: performanceColor,
-                    symbol: summary.netUnits >= 0 ? "arrow.up.right" : "arrow.down.right"
+                    symbol: performanceSymbol
                 )
                 .fixedSize(horizontal: true, vertical: false)
             }
@@ -165,9 +165,10 @@ struct DashboardView: View {
 
     private var metricGrid: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 10)], spacing: 10) {
-            CommandMetric(label: "RECORD", value: summary.record.label, detail: "W-L-P", symbol: "checklist", color: NukeTheme.hudCyan)
+            CommandMetric(label: "RECORD", value: summary.record.label, detail: "W-L-P/V", symbol: "checklist", color: NukeTheme.hudCyan)
             CommandMetric(label: "WIN RATE", value: summary.winRate.formatted(.percent.precision(.fractionLength(1))), detail: "SETTLED BETS", symbol: "scope", color: NukeTheme.matrixGreen)
             CommandMetric(label: "STREAK", value: summary.streak, detail: "CURRENT RUN", symbol: "flame.fill", color: NukeTheme.neonOrange)
+            CommandMetric(label: "OPEN RISK", value: summary.pendingExposure.plainUnitText, detail: "PENDING UNITS", symbol: "hourglass", color: NukeTheme.hudCyan)
         }
     }
 
@@ -224,6 +225,18 @@ struct DashboardView: View {
             .foregroundStyle(performanceColor)
             .neonGlow(color: performanceColor)
             .lineLimit(1)
+    }
+
+    private var performanceLabel: String {
+        if summary.netUnits > 0 { return "Positive" }
+        if summary.netUnits < 0 { return "Negative" }
+        return "Even"
+    }
+
+    private var performanceSymbol: String {
+        if summary.netUnits > 0 { return "arrow.up.right" }
+        if summary.netUnits < 0 { return "arrow.down.right" }
+        return "equal"
     }
 }
 

@@ -11,6 +11,7 @@ struct BetsView: View {
     @State private var selectedRange: HistoryRange = .allTime
     @State private var exportItem: ExportItem?
     @State private var betToDelete: Bet?
+    @State private var operationError: String?
 
     private var shownBets: [Bet] {
         bets.filter { bet in
@@ -28,6 +29,17 @@ struct BetsView: View {
     var body: some View {
         NavigationStack {
             List {
+                if shownBets.isEmpty {
+                    ContentUnavailableView(
+                        bets.isEmpty ? "No tracked bets" : "No matching bets",
+                        systemImage: bets.isEmpty ? "list.bullet.clipboard" : "line.3.horizontal.decrease.circle",
+                        description: Text(bets.isEmpty
+                                          ? "Use the LOG button to add your first bet."
+                                          : "Try changing your search or filters.")
+                    )
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                }
                 ForEach(groupedBets, id: \.key) { day, dayBets in
                     Section(day.formatted(date: .abbreviated, time: .omitted).uppercased()) {
                         ForEach(dayBets) { bet in
@@ -43,7 +55,8 @@ struct BetsView: View {
             .searchable(text: $search, prompt: "Search bet or book")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Export") { if let url = try? ExportService.writeCSV(bets: shownBets) { exportItem = ExportItem(url: url) } }.disabled(shownBets.isEmpty)
+                    Button("Export") { export() }
+                        .disabled(shownBets.isEmpty)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -70,10 +83,18 @@ struct BetsView: View {
                 }
             }
             .sheet(item: $exportItem) { item in ShareSheet(url: item.url) }
-            .alert("Delete this bet?", isPresented: Binding(get: { betToDelete != nil }, set: { if !$0 { betToDelete = nil } })) {
+            .confirmationDialog("Delete this bet?", isPresented: Binding(get: { betToDelete != nil }, set: { if !$0 { betToDelete = nil } }), titleVisibility: .visible) {
                 Button("Delete", role: .destructive) { if let betToDelete { delete(betToDelete); self.betToDelete = nil } }
                 Button("Cancel", role: .cancel) { betToDelete = nil }
             } message: { Text("This removes the bet, its legs, and its local slip-photo records.") }
+            .alert("Couldn’t Complete Action", isPresented: Binding(
+                get: { operationError != nil },
+                set: { if !$0 { operationError = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(operationError ?? "")
+            }
         }
     }
 
@@ -92,13 +113,29 @@ struct BetsView: View {
         selectedRange = .allTime
     }
 
+    private func export() {
+        do {
+            exportItem = ExportItem(url: try ExportService.writeCSV(bets: shownBets))
+        } catch {
+            operationError = "The CSV file could not be created. \(error.localizedDescription)"
+        }
+    }
+
     private func delete(_ bet: Bet) {
         let id = bet.id
-        let legs = (try? modelContext.fetch(FetchDescriptor<BetLeg>(predicate: #Predicate { $0.betID == id }))) ?? []
-        let attachments = (try? modelContext.fetch(FetchDescriptor<SlipAttachment>(predicate: #Predicate { $0.betID == id }))) ?? []
-        attachments.forEach { SlipAttachmentStore.shared.removeLocalFile(for: $0); modelContext.delete($0) }
-        legs.forEach(modelContext.delete)
-        modelContext.delete(bet)
+        do {
+            let legs = try modelContext.fetch(FetchDescriptor<BetLeg>(predicate: #Predicate { $0.betID == id }))
+            let attachments = try modelContext.fetch(FetchDescriptor<SlipAttachment>(predicate: #Predicate { $0.betID == id }))
+            let attachmentPaths = attachments.map(\.localRelativePath)
+            attachments.forEach(modelContext.delete)
+            legs.forEach(modelContext.delete)
+            modelContext.delete(bet)
+            try modelContext.save()
+            attachmentPaths.forEach { SlipAttachmentStore.shared.removeLocalFile(relativePath: $0) }
+        } catch {
+            modelContext.rollback()
+            operationError = "The bet could not be deleted. \(error.localizedDescription)"
+        }
     }
 }
 
@@ -146,7 +183,7 @@ struct BetRow: View {
         .padding(.vertical, 4)
     }
     private var formattedOdds: String { bet.oddsFormatRaw == OddsFormat.american.rawValue ? String(format: "%+.0f", bet.oddsInput) : String(format: "%.2f", bet.oddsInput) }
-    private var sportIcon: String { ["NBA": "basketball.fill", "NFL": "football.fill", "MLB": "baseball.fill", "NHL": "hockey.puck.fill", "NCAAB": "basketball.fill" ][bet.sport] ?? "sportscourt.fill" }
+    private var sportIcon: String { BetCatalog.symbol(for: bet.sport) }
     private var resultColor: Color { switch bet.result { case .win: NukeTheme.green; case .loss: NukeTheme.red; case .pending: NukeTheme.orange; case .push, .void: NukeTheme.cyan } }
 }
 
@@ -156,6 +193,7 @@ struct BetDetailView: View {
     @Query private var attachments: [SlipAttachment]
     let bet: Bet
     @State private var editing = false
+    @State private var settlementError: String?
 
     init(bet: Bet) {
         self.bet = bet
@@ -167,7 +205,7 @@ struct BetDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                NukeCard { VStack(alignment: .leading, spacing: 10) { Text(bet.title).font(.title2.bold()); Text("\(bet.sport) · \(bet.kind.label) · \(bet.sportsbook.isEmpty ? "No sportsbook" : bet.sportsbook)").foregroundStyle(NukeTheme.muted); HStack { metric("RISK", bet.riskUnits.plainUnitText); metric("TO WIN", (bet.riskUnits * (bet.oddsDecimal - 1)).plainUnitText); metric("RETURN", bet.totalReturnUnits.plainUnitText) } } }
+                NukeCard { VStack(alignment: .leading, spacing: 10) { Text(bet.title).font(.title2.bold()); Text(detailSubtitle).foregroundStyle(NukeTheme.muted); HStack { metric("RISK", bet.riskUnits.plainUnitText); metric("TO WIN", (bet.riskUnits * (bet.oddsDecimal - 1)).plainUnitText); metric("RETURN", bet.totalReturnUnits.plainUnitText) } } }
                 if !legs.isEmpty { NukeCard { VStack(alignment: .leading) { Text("LEGS").font(.caption.bold()).foregroundStyle(NukeTheme.muted); ForEach(legs) { Text("• \($0.selection)") } } } }
                 if !bet.notes.isEmpty { NukeCard { Text(bet.notes) } }
                 if !attachments.isEmpty { ScrollView(.horizontal) { HStack { ForEach(attachments) { attachment in SlipImageView(attachment: attachment) } } } }
@@ -176,11 +214,37 @@ struct BetDetailView: View {
         }
         .background(NukeTheme.background).navigationTitle("Bet Details").toolbar { Button("Edit") { editing = true } }
         .sheet(isPresented: $editing) { AddBetView(editing: bet) }
+        .alert("Couldn’t Settle Bet", isPresented: Binding(
+            get: { settlementError != nil },
+            set: { if !$0 { settlementError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(settlementError ?? "")
+        }
     }
 
     private var settlementControls: some View {
-        NukeCard { VStack(alignment: .leading, spacing: 12) { Text("SETTLE BET").font(.caption.bold()).foregroundStyle(NukeTheme.muted); HStack { ForEach([BetResult.win, .loss, .push, .void]) { result in Button(result.label) { bet.resultRaw = result.rawValue; bet.settledAt = .now; bet.updatedAt = .now; try? modelContext.save() }.buttonStyle(ResultButton(result: result)) } } } }
+        NukeCard { VStack(alignment: .leading, spacing: 12) { Text("SETTLE BET").font(.caption.bold()).foregroundStyle(NukeTheme.muted); HStack { ForEach([BetResult.win, .loss, .push, .void]) { result in Button(result.label) { settle(as: result) }.buttonStyle(ResultButton(result: result)) } } } }
     }
+
+    private var detailSubtitle: String {
+        [bet.sport, bet.league, bet.kind.label, bet.sportsbook.isEmpty ? "No sportsbook" : bet.sportsbook]
+            .filter { !$0.isEmpty }
+            .joined(separator: " · ")
+    }
+
+    private func settle(as result: BetResult) {
+        bet.resultRaw = result.rawValue
+        bet.settledAt = .now
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            settlementError = error.localizedDescription
+        }
+    }
+
     private func metric(_ label: String, _ value: String) -> some View { VStack(alignment: .leading) { Text(label).font(.caption2).foregroundStyle(NukeTheme.muted); Text(value).font(.headline).foregroundStyle(NukeTheme.cyan) }.frame(maxWidth: .infinity, alignment: .leading) }
 }
 
@@ -193,7 +257,7 @@ private struct SlipImageView: View {
             else { ProgressView().frame(width: 170, height: 120) }
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .task { image = await SlipAttachmentStore.shared.downloadIfNeeded(attachment) }
+        .task { image = SlipAttachmentStore.shared.image(for: attachment) }
     }
 }
 

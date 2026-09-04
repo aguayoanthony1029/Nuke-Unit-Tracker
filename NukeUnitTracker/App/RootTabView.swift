@@ -2,9 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct RootTabView: View {
-    @Environment(\.modelContext) private var modelContext
     let profile: UserProfile
-    @Query private var attachments: [SlipAttachment]
     @State private var selection: AppTab = .home
     @State private var isAddingBet = false
 
@@ -33,7 +31,6 @@ struct RootTabView: View {
         .fullScreenCover(isPresented: $isAddingBet) {
             AddBetView()
         }
-        .task { await SlipAttachmentStore.shared.retryPendingUploads(attachments, in: modelContext) }
     }
 
     @ViewBuilder

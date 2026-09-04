@@ -3,8 +3,8 @@ import SwiftData
 
 struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var name = ""
     @State private var unitValue = 10.0
+    @State private var saveError: String?
 
     var body: some View {
         ZStack {
@@ -15,10 +15,14 @@ struct OnboardingView: View {
                     brandHeader
                     missionPanel
                     setupPanel
-                    Text("Private by default. Your tracker works without an account and stays yours.")
-                        .font(.footnote)
-                        .foregroundStyle(NukeTheme.muted)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    VStack(spacing: 5) {
+                        Text("For adults 18+. Personal tracking and educational use only.")
+                        Text("Private by default. Your tracker works without an account and stays yours.")
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(NukeTheme.muted)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 18)
@@ -32,10 +36,20 @@ struct OnboardingView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(NukePrimaryButton())
+            .disabled(!unitValueIsValid)
+            .opacity(unitValueIsValid ? 1 : 0.55)
             .padding(.horizontal, 20)
             .padding(.top, 10)
             .padding(.bottom, 10)
             .background(.ultraThinMaterial)
+        }
+        .alert("Couldn’t Start Tracker", isPresented: Binding(
+            get: { saveError != nil },
+            set: { if !$0 { saveError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "")
         }
     }
 
@@ -75,7 +89,7 @@ struct OnboardingView: View {
                     .frame(width: 36, height: 36)
                     .background(NukeTheme.cyan.opacity(0.12), in: Circle())
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("READY FOR THE BOARD?")
+                    Text("SET UP YOUR TRACKER")
                         .font(.headline.weight(.black))
                     Text("Log action fast. Review your units. Keep the story in the numbers.")
                         .font(.subheadline)
@@ -94,21 +108,17 @@ struct OnboardingView: View {
                     .foregroundStyle(NukeTheme.orange)
 
                 VStack(alignment: .leading, spacing: 7) {
-                    Text("CALLSIGN (OPTIONAL)")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(NukeTheme.muted)
-                    TextField("Leave blank if you prefer", text: $name)
-                        .textInputAutocapitalization(.words)
-                        .textFieldStyle(NukeFieldStyle())
-                }
-
-                VStack(alignment: .leading, spacing: 7) {
                     Text("ONE UNIT IS WORTH")
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(NukeTheme.muted)
                     TextField("$10", value: $unitValue, format: .currency(code: "USD"))
                         .keyboardType(.decimalPad)
                         .textFieldStyle(NukeFieldStyle())
+                    if !unitValueIsValid {
+                        Text("Enter a unit value greater than zero.")
+                            .font(.caption)
+                            .foregroundStyle(NukeTheme.red)
+                    }
                 }
 
                 HStack(spacing: 8) {
@@ -121,9 +131,20 @@ struct OnboardingView: View {
         }
     }
 
+    private var unitValueIsValid: Bool { unitValue.isFinite && unitValue > 0 }
+
     private func createProfile() {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        modelContext.insert(UserProfile(displayName: trimmedName, unitValue: max(unitValue, 0.01)))
+        guard unitValueIsValid else {
+            saveError = "Enter a unit value greater than zero."
+            return
+        }
+        modelContext.insert(UserProfile(unitValue: unitValue))
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            saveError = error.localizedDescription
+        }
     }
 }
 
