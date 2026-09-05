@@ -22,7 +22,7 @@ Open **Bets**, choose any filters you want, then tap **Export**. The app creates
 
 ### Can the app scan a slip for me?
 
-Yes. While adding or editing a record, choose **Scan a slip to prefill** and select an image with the system Photos picker. The app uses on-device text recognition to suggest visible sportsbook, sport, parlay type, odds, stake, and matchup details. Review every suggested value before saving; image quality and slip layouts can affect recognition. The scanned image is attached locally when you save, subject to the three-photo limit.
+Yes. While adding or editing a record, choose **Scan slip** in the top-right corner and select one or more images with the system Photos picker. The app uses on-device text recognition to suggest visible sportsbook, sport, parlay type, odds, stake, and selections. For a long parlay split across screenshots, it combines new legs and skips repeated legs in overlapping screenshots. Review every suggested value before saving; image quality and slip layouts can affect recognition. Scanned images are attached locally only when you save, subject to the ten-photo limit.
 
 ### How do I delete my data?
 

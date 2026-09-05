@@ -31,7 +31,7 @@ No API keys, Discord bot, database, or backend service are required.
 ## What the release includes
 
 - Manual bet logging with American or decimal odds
-- On-device slip scanning that prefills recognizable details for review
+- On-device slip scanning that can combine multiple screenshots into one parlay without duplicate legs
 - Straight, parlay, and same-game parlay records
 - Win, loss, push, void, and pending states
 - Unit, ROI, calendar, sport, sportsbook, and bet-type statistics
