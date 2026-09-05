@@ -7,22 +7,20 @@ struct RootTabView: View {
     @State private var isAddingBet = false
 
     var body: some View {
-        // The root owns the viewport, background, and safe-area reservation.
-        // Individual tabs only own their scrollable content.
+        // This is a vertical layout, not an overlay: tab content gets only the
+        // space above the dock, so List/Form rows cannot sit behind it.
         ZStack {
             NukeTheme.background
                 .ignoresSafeArea()
 
             NukeCommandBackdrop()
 
-            selectedScreen
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
-                .padding(.horizontal, 12)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
+            VStack(spacing: 0) {
+                selectedScreen
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+
+                NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
+            }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(isPresented: $isAddingBet) {
@@ -98,22 +96,42 @@ private struct NukeTabBar: View {
             tabButton(.stats)
             tabButton(.profile)
         }
-        .padding(.horizontal, 10)
-        .padding(.top, 8)
+        .padding(.horizontal, 14)
+        .padding(.top, 12)
         .padding(.bottom, 8)
         .background {
             ZStack {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 28,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 28,
+                    style: .continuous
+                )
                     .fill(.ultraThinMaterial)
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 28,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 28,
+                    style: .continuous
+                )
                     .fill(NukeTheme.bgBase.opacity(0.82))
             }
+            .ignoresSafeArea(edges: .bottom)
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.28), radius: 12, y: 4)
+        .overlay {
+            UnevenRoundedRectangle(
+                topLeadingRadius: 28,
+                bottomLeadingRadius: 0,
+                bottomTrailingRadius: 0,
+                topTrailingRadius: 28,
+                style: .continuous
+            )
+            .stroke(Color.white.opacity(0.14), lineWidth: 1)
+            .ignoresSafeArea(edges: .bottom)
+        }
+        .shadow(color: .black.opacity(0.24), radius: 12, y: -4)
         .accessibilityIdentifier("main-tab-bar")
     }
 

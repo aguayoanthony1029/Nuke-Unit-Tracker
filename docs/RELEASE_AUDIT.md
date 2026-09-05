@@ -4,7 +4,7 @@ Audited September 4, 2026. This is an engineering and App Review readiness audit
 
 ## Verified in this source tree
 
-- 17 unit tests and 6 UI tests pass on the iPhone 17 Pro simulator running iOS 26.5.
+- 22 unit tests and 6 UI tests pass on the iPhone 17 Pro simulator running iOS 26.5.
 - Release builds succeed for generic iOS devices with signing disabled for local verification.
 - Xcode static analysis, plist linting, and Git whitespace checks pass.
 - The app has no developer-operated API, analytics, advertising, tracking, login, or payment SDK.
