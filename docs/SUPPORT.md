@@ -10,7 +10,11 @@ No. Set a unit value during onboarding and start tracking.
 
 ### Where is my data stored?
 
-Tracker records are stored on your device and may sync through your private iCloud database when iCloud is available. Slip photos stay on the device where you selected them.
+Tracker records are stored on your device and may sync through your private iCloud database when iCloud is available. Slip photos stay on the device where you selected them, are compressed to a maximum 1,280-pixel dimension, and are capped at 400 MB total. The app never automatically deletes photos to make room.
+
+### Will an update erase my tracker?
+
+No. App updates keep your existing tracker records. Do not delete the app if you want to keep device-local slip photos; deleting the app removes its local files.
 
 ### How do I export my records?
 
@@ -30,8 +34,10 @@ No. Community membership is separate from the app. Every tracker feature is avai
 
 ## Contact
 
-To report a problem, open a GitHub support issue and include your iPhone model, iOS version, app version, and the steps that caused the problem:
+Email [zodiark@nukesportsbets.com](mailto:zodiark@nukesportsbets.com) for support.
+
+For a bug report, include your iPhone model, iOS version, app version, and the steps that caused the problem. You can also open a GitHub support issue:
 
 https://github.com/aguayoanthony1029/Nuke-Unit-Tracker/issues
 
-Do not include sportsbook passwords, payment information, or other sensitive personal information.
+Do not include sportsbook passwords, payment information, or other sensitive personal information in email or GitHub Issues.

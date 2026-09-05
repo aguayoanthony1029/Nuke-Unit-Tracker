@@ -15,17 +15,14 @@ struct RootTabView: View {
 
             NukeCommandBackdrop()
 
-            GeometryReader { viewport in
-                selectedScreen
-                    .frame(
-                        width: viewport.size.width,
-                        height: viewport.size.height,
-                        alignment: .top
-                    )
-            }
+            selectedScreen
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             NukeTabBar(selection: $selection, addAction: { isAddingBet = true })
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
+                .padding(.bottom, 8)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(isPresented: $isAddingBet) {
@@ -106,15 +103,18 @@ private struct NukeTabBar: View {
         .padding(.bottom, 8)
         .background {
             ZStack {
-                Rectangle().fill(.ultraThinMaterial)
-                NukeTheme.bgBase.opacity(0.72)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(NukeTheme.bgBase.opacity(0.82))
             }
         }
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Color.white.opacity(0.10))
-                .frame(height: 1)
-        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.28), radius: 12, y: 4)
+        .accessibilityIdentifier("main-tab-bar")
     }
 
     private func tabButton(_ tab: AppTab) -> some View {

@@ -25,4 +25,22 @@ final class SlipAttachmentStoreTests: XCTestCase {
             XCTAssertEqual(protection, .complete)
         }
     }
+
+    func testStorageLimitPreventsAdditionalSlipPhotos() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "SlipAttachmentStoreTests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let store = try SlipAttachmentStore(directory: directory, maximumStorageBytes: 1)
+        let image = UIGraphicsImageRenderer(size: CGSize(width: 40, height: 40)).image { context in
+            UIColor.systemCyan.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 40, height: 40))
+        }
+        let imageData = try XCTUnwrap(image.jpegData(compressionQuality: 1))
+
+        XCTAssertThrowsError(try store.save(imageData: imageData, for: UUID())) { error in
+            XCTAssertEqual(error as? SlipAttachmentStoreError, .storageLimitReached)
+        }
+        XCTAssertEqual(store.storageUsageBytes, 0)
+    }
 }

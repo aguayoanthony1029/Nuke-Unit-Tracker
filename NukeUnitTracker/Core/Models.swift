@@ -24,8 +24,20 @@ enum BetResult: String, CaseIterable, Codable, Identifiable {
 @Model
 final class UserProfile {
     var id: UUID = UUID()
+    // These legacy fields stay in the model so upgrades from earlier builds keep
+    // their existing records. The current interface intentionally does not use them.
+    var displayName: String = ""
     var unitValue: Double = 10
     var oddsFormatRaw: String = OddsFormat.american.rawValue
+    var freePickAlertsEnabled: Bool = false
+    var quietHoursStart: Int = 22
+    var quietHoursEnd: Int = 8
+    var premiumAccessRaw: String = "free"
+    var discordUserID: String?
+    var discordDisplayName: String?
+    var premiumVerifiedAt: Date?
+    var premiumExpiresAt: Date?
+    var createdAt: Date = Date.now
 
     init(unitValue: Double) {
         self.unitValue = unitValue
@@ -50,6 +62,9 @@ final class Bet {
     var placedAt: Date = Date.now
     var settledAt: Date?
     var notes: String = ""
+    // Kept for on-device schema compatibility with earlier app builds.
+    var eventIdentifier: String?
+    var updatedAt: Date = Date.now
 
     init(title: String, sport: String, league: String, sportsbook: String, kind: BetKind, oddsInput: Double, oddsFormat: OddsFormat, riskUnits: Double, result: BetResult, placedAt: Date, notes: String) {
         self.title = title
@@ -89,7 +104,38 @@ final class SlipAttachment {
     var id: UUID = UUID()
     var betID: UUID = UUID()
     var localRelativePath: String = ""
+    // Previous builds could sync slip assets privately. Retaining this metadata
+    // prevents an update from discarding an existing attachment record.
+    var cloudRecordName: String?
+    var createdAt: Date = Date.now
     init(betID: UUID, localRelativePath: String) {
         self.betID = betID; self.localRelativePath = localRelativePath
+    }
+}
+
+/// This model is no longer shown in the app, but it remains in storage so an
+/// update from an earlier build never has to remove a user's saved records.
+@Model
+final class TailBoardItem {
+    var id: UUID = UUID()
+    var sourcePickID: String = ""
+    var sourcePostID: String?
+    var label: String = ""
+    var sport: String = "Other"
+    var league: String?
+    var event: String = ""
+    var selection: String = ""
+    var market: String?
+    var line: String?
+    var oddsAmerican: Double?
+    var oddsDecimal: Double?
+    var bookmaker: String?
+    var startsAt: Date?
+    var isInBasket: Bool = true
+    var createdAt: Date = Date.now
+    var updatedAt: Date = Date.now
+
+    init(sourcePickID: String = "") {
+        self.sourcePickID = sourcePickID
     }
 }

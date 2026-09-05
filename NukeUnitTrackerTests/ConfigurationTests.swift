@@ -7,11 +7,12 @@ final class ConfigurationTests: XCTestCase {
             AppLinks.communityMembership,
             AppLinks.bankrollManagement,
             AppLinks.privacyPolicy,
-            AppLinks.support,
             AppLinks.responsibleGambling
         ]
 
         XCTAssertTrue(links.allSatisfy { $0.scheme == "https" && $0.host != nil })
+        XCTAssertEqual(AppLinks.support.scheme, "mailto")
+        XCTAssertEqual(AppLinks.support.absoluteString, "mailto:zodiark@nukesportsbets.com")
     }
 
     func testCommunityMembershipUsesTheApprovedWhopCheckout() {

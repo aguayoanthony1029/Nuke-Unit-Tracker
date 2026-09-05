@@ -6,36 +6,24 @@ enum PersistenceController {
     private static let logger = Logger(subsystem: "com.nukesportsbets.nukeunittracker", category: "Persistence")
 
     static func makeContainer(inMemory: Bool = false) -> ModelContainer {
-        let syncedSchema = Schema([
-            UserProfile.self,
-            Bet.self,
-            BetLeg.self
-        ])
-        let attachmentSchema = Schema([SlipAttachment.self])
-        let fullSchema = Schema([
+        // Keep this schema and configuration name stable. Changing either can
+        // strand data created by an earlier version of the app.
+        let schema = Schema([
             UserProfile.self,
             Bet.self,
             BetLeg.self,
-            SlipAttachment.self
+            SlipAttachment.self,
+            TailBoardItem.self
         ])
-        let syncedConfiguration = ModelConfiguration(
+        let configuration = ModelConfiguration(
             "NukeUnitTracker",
-            schema: syncedSchema,
+            schema: schema,
             isStoredInMemoryOnly: inMemory,
             cloudKitDatabase: inMemory ? .none : .automatic
         )
-        let attachmentConfiguration = ModelConfiguration(
-            "NukeUnitTrackerAttachments",
-            schema: attachmentSchema,
-            isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: .none
-        )
 
         do {
-            return try ModelContainer(
-                for: fullSchema,
-                configurations: syncedConfiguration, attachmentConfiguration
-            )
+            return try ModelContainer(for: schema, configurations: configuration)
         } catch {
             guard !inMemory else {
                 fatalError("Unable to initialize test storage: \(error.localizedDescription)")
@@ -44,14 +32,11 @@ enum PersistenceController {
             logger.error("iCloud-backed storage failed to initialize; retrying local-only storage: \(error.localizedDescription, privacy: .public)")
             let localConfiguration = ModelConfiguration(
                 "NukeUnitTracker",
-                schema: syncedSchema,
+                schema: schema,
                 cloudKitDatabase: .none
             )
             do {
-                return try ModelContainer(
-                    for: fullSchema,
-                    configurations: localConfiguration, attachmentConfiguration
-                )
+                return try ModelContainer(for: schema, configurations: localConfiguration)
             } catch {
                 fatalError("Unable to initialize tracker storage: \(error.localizedDescription)")
             }

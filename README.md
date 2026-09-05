@@ -36,7 +36,7 @@ No API keys, Discord bot, database, or backend service are required.
 - Win, loss, push, void, and pending states
 - Unit, ROI, calendar, sport, sportsbook, and bet-type statistics
 - Search, filters, bet editing, settlement, deletion, and CSV export
-- Up to three device-local slip photos per bet
+- Up to three compressed device-local slip photos per bet, with a 400 MB device-storage cap
 - Private iCloud sync for tracker records when iCloud is available
 - Privacy, support, responsible-use, and full-data-deletion controls
 - A U.S.-storefront-only external link to optional community membership

@@ -93,6 +93,10 @@ struct AddBetView: View {
                     }
                     .disabled(isSaving || isScanningSlip)
 
+                    Text("Up to 3 photos per bet. Photos are compressed and capped at \(SlipAttachmentStore.shared.storageLimitDescription) on this device.")
+                        .font(.caption)
+                        .foregroundStyle(NukeTheme.muted)
+
                     Text("Scanning uses on-device text recognition. Nothing from a slip is sent to a server; review all prefilled details before saving.")
                         .font(.caption)
                         .foregroundStyle(NukeTheme.muted)
