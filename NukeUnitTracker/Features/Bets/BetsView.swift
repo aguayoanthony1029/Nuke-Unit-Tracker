@@ -257,7 +257,7 @@ private struct SlipImageView: View {
             else { ProgressView().frame(width: 170, height: 120) }
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .task { image = SlipAttachmentStore.shared.image(for: attachment) }
+        .task { image = await SlipAttachmentStore.shared.imageForDisplay(for: attachment) }
     }
 }
 

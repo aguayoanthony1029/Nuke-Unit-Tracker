@@ -14,7 +14,7 @@ You do not create an account with Nuke Unit Tracker. The app does not request yo
 
 Tracker records are stored on your device. If iCloud is available for the app, Apple may sync those records through your private iCloud database so they are available on your devices. Nuke Sports Bets does not receive those records through a developer-operated server.
 
-Slip photos are compressed and stored only inside the app’s private storage on the device where you selected them and use iOS file protection while the device is locked. Slip text recognition happens on the device; neither the image nor recognized text is uploaded by Nuke Unit Tracker. Slip photos are not included in CSV exports.
+Slip photos are reduced to a maximum 1,280-pixel dimension, compressed, and stored only inside the app’s private storage on the device where you selected them. The app caps local slip-photo storage at 400 MB and never automatically deletes a photo to make room. Files use iOS file protection while the device is locked. Slip text recognition happens on the device; neither the image nor recognized text is uploaded by the current Nuke Unit Tracker app. If you used an earlier version that saved a slip photo to your private iCloud database, the app may retrieve that existing image so it remains available after an update. Slip photos are not included in CSV exports.
 
 Apple processes iCloud data under Apple’s terms and privacy policy.
 
@@ -48,6 +48,6 @@ If this policy changes, the effective date at the top of this page will be updat
 
 ## Contact
 
-For privacy questions or support, open an issue at:
+For privacy questions or support, email [zodiark@nukesportsbets.com](mailto:zodiark@nukesportsbets.com). You can also open a GitHub Issue:
 
 https://github.com/aguayoanthony1029/Nuke-Unit-Tracker/issues

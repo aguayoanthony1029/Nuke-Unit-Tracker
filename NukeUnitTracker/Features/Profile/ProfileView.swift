@@ -45,7 +45,8 @@ struct ProfileView: View {
                 Section("YOUR DATA") {
                     LabeledContent("Tracked bets", value: "\(bets.count)")
                     LabeledContent("Slip photos", value: "\(attachments.count)")
-                    Text("Tracker records sync through your private iCloud database when iCloud is available. Slip photos stay only on this device.")
+                    LabeledContent("Photo storage", value: SlipAttachmentStore.shared.storageUsageDescription)
+                    Text("Tracker records sync through your private iCloud database when iCloud is available. Slip photos stay only on this device and are capped at \(SlipAttachmentStore.shared.storageLimitDescription).")
                         .font(.footnote)
                         .foregroundStyle(NukeTheme.muted)
 
@@ -61,7 +62,7 @@ struct ProfileView: View {
                     }
                     .accessibilityIdentifier("privacy-policy-link")
                     Link(destination: AppLinks.support) {
-                        Label("Support", systemImage: "questionmark.circle.fill")
+                        Label("Email Support", systemImage: "questionmark.circle.fill")
                     }
                     .accessibilityIdentifier("support-link")
                 }

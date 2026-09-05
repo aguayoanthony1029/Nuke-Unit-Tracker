@@ -1,12 +1,12 @@
 # App Review Submission Guide
 
-This guide is for build 3 of Nuke Unit Tracker 1.0. Complete the physical-device test and replace any bracketed item before copying the notes into App Store Connect.
+This guide is for build 4 of Nuke Unit Tracker 1.0. Complete the physical-device test and replace any bracketed item before copying the notes into App Store Connect.
 
 ## Before resubmitting
 
 1. Merge or publish these changes so the updated privacy and support documents are publicly reachable from the repository’s `main` branch.
 2. In CloudKit Console, select `iCloud.com.nukesportsbets.nukeunittracker` and deploy the finalized development schema to Production. TestFlight and App Store builds can use only the production environment.
-3. Upload build 3 to TestFlight and install it on the physical iPhone.
+3. Upload build 4 to TestFlight and install it on the physical iPhone.
 4. Delete the old app first so the recording begins at onboarding.
 5. Complete the recording script below without a crash, blank screen, or unfinished feature.
 6. Add the recording to the Resolution Center reply.
@@ -14,7 +14,7 @@ This guide is for build 3 of Nuke Unit Tracker 1.0. Complete the physical-device
 8. Set the age rating override to 18+ and answer the gambling-related content questions accurately.
 9. Use `https://github.com/aguayoanthony1029/Nuke-Unit-Tracker/blob/main/docs/PRIVACY.md` for the Privacy Policy URL and `https://github.com/aguayoanthony1029/Nuke-Unit-Tracker/blob/main/docs/SUPPORT.md` for the Support URL.
 10. In App Privacy, declare **No, we do not collect data from this app** only if this build remains unchanged: records use the user’s private CloudKit database (not visible to the developer), and slip recognition stays on device with no analytics, login, or developer server.
-11. Add a public support email to the Support page and App Store Connect before submission. GitHub Issues can remain an additional option, but should not be the only way to contact you.
+11. Confirm that `zodiark@nukesportsbets.com` is shown as the public support contact in App Store Connect. GitHub Issues remain an additional option.
 
 ## Physical-device recording script
 
@@ -34,7 +34,7 @@ No app account, demo credentials, sample file, location permission, camera permi
 
 ## Paste into App Review Information → Notes
 
-NUKE UNIT TRACKER 1.0 (BUILD 3) — REVIEW INFORMATION
+NUKE UNIT TRACKER 1.0 (BUILD 4) — REVIEW INFORMATION
 
 1. PHYSICAL-DEVICE RECORDING
 A screen recording is attached to our Resolution Center reply. It starts with app launch and shows onboarding, manual bet entry, history, settlement, dashboard/stat updates, CSV export, settings/privacy controls, full-data deletion confirmation, and the optional external community-membership handoff.
